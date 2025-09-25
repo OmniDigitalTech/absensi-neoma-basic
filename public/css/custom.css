@@ -1,0 +1,75 @@
+.swal2-container {
+    z-index: 99999 !important; /* Ensures it's above everything */
+}
+
+/* Overall Modal (Background Overlay) */
+.imageModal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Dimmed background */
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+}
+
+/* The Modal Dialog (The Box) */
+.image-modal-dialog {
+    background-color: #fff; /* White background for modal box */
+    padding: 40px;
+    border-radius: 10px;
+    max-width: 90%; /* Max width for smaller screens */
+    max-height: 90%; /* Prevent modal from overflowing */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    overflow: hidden; /* Hide overflowing content */
+    position: relative; /* For proper positioning of close button */
+    display: flex;
+    flex-direction: column; /* Ensure close button and image stack vertically */
+    justify-content: center;
+    align-items: center;
+}
+
+/* The Image Inside the Modal */
+.imaage-modal-content {
+    max-width: 100%; /* Ensure image doesn't overflow width */
+    max-height: 45vh; /* Restrict the image height to viewport */
+    object-fit: contain; /* Preserve aspect ratio while fitting in container */
+    border-radius: 5px;
+    display: block;
+}
+
+/* Close Button Style */
+.close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    color: #333; /* Dark close button color for light background */
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.8); /* Soft background */
+    border-radius: 50%;
+    padding: 5px;
+    border: none;
+    transition: 0.3s ease;
+}
+
+.close:hover {
+    color: #000; /* Slightly darker on hover */
+    background-color: rgba(200, 200, 200, 0.9); /* Darken background */
+}
+
+/* Responsive Adjustments */
+@media screen and (max-width: 768px) {
+    .image-modal-dialog {
+        max-width: 95%; /* Further shrink width for small screens */
+    }
+
+    .close {
+        font-size: 20px; /* Smaller close button on smaller screens */
+    }
+}
