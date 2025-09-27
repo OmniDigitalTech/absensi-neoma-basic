@@ -17,14 +17,14 @@ Follow these steps to set up the application:
 
 1. Clone the repository to your www folder inside laragon:
    ```bash
-   git clone https://github.com/OmniDigitalTech/absensi-neoma.git
+   git clone https://github.com/OmniDigitalTech/absensi-neoma-basic.git
    ```
    - or download the zip file and extract it to your www folder inside laragon.
 
 
 2. Navigate into the project directory:
    ```bash
-   cd absensi-neoma
+   cd absensi-neoma-basic
    ```
 
 3. Install required Node.js dependencies using npm:
