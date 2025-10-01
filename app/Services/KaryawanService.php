@@ -14,10 +14,10 @@ use App\Models\Upah;
 class KaryawanService
 {
     public function getCutiIzinUpahDeduksiKaryawan ($golonganId, $tipeKaryawan) {
-        $settings = settings::first();
+        $settings = settings::query()->first();
         $cutiIzin = [];
         $upah = [];
-        $dynamicUpah = [];
+//        $dynamicUpah = [];
         $deduksi = [];
         $bpjsKesehatan = [];
         $bpjsKetenagakerjaan = [];
@@ -33,18 +33,18 @@ class KaryawanService
 
         if ($golonganId) {
             $cutiIzin = DataCuti::all();
-            $upah = Upah::where('golongan_id', $golonganId)->get();
-            $dynamicUpah = DynamicUpah::where('golongan_id', $golonganId)->get();
+            $upah = Upah::query()->where('golongan_id', $golonganId)->get();
+//            $dynamicUpah = DynamicUpah::where('golongan_id', $golonganId)->get();
             $deduksi = Deduksi::all();
 
-            if ($dynamicUpah->isNotEmpty()) {
+            if ($upah->isNotEmpty()) {
                 if ($settings->bpjs_kesehatan === 'ya') {
                     if ($tipeKaryawan === 'tetap' || ($tipeKaryawan === 'kontrak' && $settings->bpjs_kesehatan_kontrak === 'ya')) {
-                        $firstRow = $dynamicUpah->first();
-                        if ($firstRow->jumlah > 4000000) {
-                            $bpjsKesehatan = Kesehatan::where('id', 1)->get();
+                        $gajiPokok = $upah[0]->gaji_pokok;
+                        if ($gajiPokok > 4000000) {
+                            $bpjsKesehatan = Kesehatan::query()->where('id', 1)->get();
                         } else {
-                            $bpjsKesehatan = Kesehatan::where('id', 2)->get();
+                            $bpjsKesehatan = Kesehatan::query()->where('id', 2)->get();
                         }
                     }
                 }
@@ -66,7 +66,7 @@ class KaryawanService
         return [
             'cuti_izin' => $cutiIzin,
             'upah' => $upah,
-            'dynamicUpah' => $dynamicUpah,
+//            'dynamicUpah' => $dynamicUpah,
             'deduksi' => $deduksi,
             'bpjsKesehatan' => $bpjsKesehatan,
             'bpjsKetenagakerjaan' => $bpjsKetenagakerjaan,

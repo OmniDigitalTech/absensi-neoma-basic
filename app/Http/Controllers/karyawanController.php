@@ -125,7 +125,8 @@ class karyawanController extends Controller
     private function getKaryawanBenefits($golonganId, $tipeKaryawan) {
         $karyawanBenefits = $this->karyawanService->getCutiIzinUpahDeduksiKaryawan($golonganId, $tipeKaryawan);
         $cutiIzin = collect($karyawanBenefits['cuti_izin']);
-        $dynamicUpah = collect($karyawanBenefits['dynamicUpah']);
+        $upah = collect($karyawanBenefits['upah']);
+//        $dynamicUpah = collect($karyawanBenefits['dynamicUpah']);
         $deduksi = collect($karyawanBenefits['deduksi']);
         $bpjsKesehatan = collect($karyawanBenefits['bpjsKesehatan']);
         $bpjsKetenagakerjaan = collect($karyawanBenefits['bpjsKetenagakerjaan']);
@@ -133,8 +134,8 @@ class karyawanController extends Controller
 
         return response()->json([
             'cuti_izin_view' => view('karyawan.partials.cuti_izin_tambah_karyawan', [ 'data_cuti_izin' => $cutiIzin ])->render(),
-//            'upah_view' => view('karyawan.partials.upah_tambah_karyawan', [ 'data_upah' => $karyawanBenefits['upah'] ])->render(),
-            'dynamic_upah_view' => view('karyawan.partials.dynamic_upah_tambah_karyawan', [ 'data_dynamic_upah' => $dynamicUpah ])->render(),
+            'upah_view' => view('karyawan.partials.upah_tambah_karyawan', [ 'data_upah' => $upah ])->render(),
+//            'dynamic_upah_view' => view('karyawan.partials.dynamic_upah_tambah_karyawan', [ 'data_dynamic_upah' => $dynamicUpah ])->render(),
             'deduksi_view' => view('karyawan.partials.deduksi_tambah_karyawan',
                 [
                     'data_deduksi' => $deduksi, 'tipe_karyawan' => $tipeKaryawan,
@@ -202,18 +203,19 @@ class karyawanController extends Controller
     public function detail(Request $request, $id)
     {
         if ($request->ajax() && $request->input('golongan_id') && $request->input('tipe_karyawan')) {
-            Log::info('cek ajax');
+//            Log::info('cek ajax');
             $changedGolonganId = $request->input('golongan_id');
             $changedTipeKaryawan = $request->input('tipe_karyawan');
 
             return $this->getKaryawanBenefits($changedGolonganId, $changedTipeKaryawan);
         } else {
-            $golonganId = User::find($id)->golongan_id;
-            $tipeKaryawan = User::find($id)->tipe_karyawan;
+            $golonganId = User::query()->find($id)->golongan_id;
+            $tipeKaryawan = User::query()->find($id)->tipe_karyawan;
 
             $karyawanBenefits = $this->karyawanService->getCutiIzinUpahDeduksiKaryawan($golonganId, $tipeKaryawan);
             $cutiIzin = $karyawanBenefits['cuti_izin'];
-            $dynamicUpah = $karyawanBenefits['dynamicUpah'];
+            $upah = $karyawanBenefits['upah'];
+//            $dynamicUpah = $karyawanBenefits['dynamicUpah'];
             $deduksi = $karyawanBenefits['deduksi'];
             $bpjsKesehatan = $karyawanBenefits['bpjsKesehatan'];
             $bpjsKetenagakerjaan = $karyawanBenefits['bpjsKetenagakerjaan'];
@@ -227,7 +229,8 @@ class karyawanController extends Controller
             'data_golongan' => Golongan::all(),
             'data_lokasi' => Lokasi::where('status', 'approved')->get(),
             'data_cuti_izin' => $cutiIzin,
-            'data_dynamic_upah' =>  $dynamicUpah,
+            'data_upah' =>  $upah,
+//            'data_dynamic_upah' =>  $dynamicUpah,
             'data_deduksi' => $deduksi,
             'data_bpjs_kesehatan' => $bpjsKesehatan,
             'data_bpjs_ketenagakerjaan' => $bpjsKetenagakerjaan,
