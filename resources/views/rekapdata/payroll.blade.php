@@ -171,7 +171,7 @@
                         <div class="col mb-4">
                             <div class="card p-4">
                                 <label for="gaji_pokok">Gaji Pokok</label>
-                                <input type="text" class="form-control money @error('gaji_pokok') is-invalid @enderror" id="gaji_pokok" name="gaji_pokok" value="{{ old('gaji_pokok', number_format($data_dynamic_upah[0]['jumlah'], 0, ',', '.')) }}">
+                                <input type="text" class="form-control money @error('gaji_pokok') is-invalid @enderror" id="gaji_pokok" name="gaji_pokok" value="{{ old('gaji_pokok', number_format($data_upah[0]['gaji_pokok'], 0, ',', '.')) }}">
                                 @error('gaji_pokok')
                                 <div class="invalid-feedback">
                                     {{ $message }}
@@ -194,7 +194,7 @@
                                     @enderror
                                 </div>
                                 <div class="input-group mb-3">
-                                    <input type="text" class="form-control money @error('uang_kehadiran') is-invalid @enderror" id="uang_kehadiran" name="uang_kehadiran" value="{{ old('uang_kehadiran', number_format($data_dynamic_upah[1]['jumlah'], 0, ',', '.')) }}">
+                                    <input type="text" class="form-control money @error('uang_kehadiran') is-invalid @enderror" id="uang_kehadiran" name="uang_kehadiran" value="{{ old('uang_kehadiran', number_format($data_upah[0]['kehadiran'], 0, ',', '.')) }}">
                                     <div class="input-group-text">
                                         <span>Uang 100% Kehadiran</span>
                                     </div>
@@ -224,7 +224,7 @@
                                     @enderror
                                 </div>
                                 <div class="input-group mb-3">
-                                    <input type="text" class="form-control money @error('uang_lembur') is-invalid @enderror" id="uang_lembur" name="uang_lembur" value="{{ old('uang_lembur', number_format($data_dynamic_upah[2]['jumlah'], 0, ',', '.')) }}">
+                                    <input type="text" class="form-control money @error('uang_lembur') is-invalid @enderror" id="uang_lembur" name="uang_lembur" value="{{ old('uang_lembur', number_format($data_upah[0]['lembur'], 0, ',', '.')) }}">
                                     <div class="input-group-text">
                                         <span>Uang Lembur</span>
                                     </div>
@@ -252,7 +252,7 @@
                                     @enderror
                                 </div>
                                 <div class="input-group mb-3">
-                                    <input type="text" class="form-control money @error('uang_oncall') is-invalid @enderror" id="uang_oncall" name="uang_oncall" value="{{ old('uang_oncall', number_format($data_dynamic_upah[3]['jumlah'], 0, ',', '.')) }}">
+                                    <input type="text" class="form-control money @error('uang_oncall') is-invalid @enderror" id="uang_oncall" name="uang_oncall" value="{{ old('uang_oncall', number_format($data_upah[0]['oncall'], 0, ',', '.')) }}">
                                     <div class="input-group-text">
                                         <span>Uang Oncall</span>
                                     </div>
@@ -364,10 +364,10 @@
                             </div>
                         </div>
                     </div>
-                    <div id="deduksi_umum_section">
-                        @include('rekapdata.partials.potongan_umum',
-                            ['data_deduksi' => $data_deduksi ?? null])
-                    </div>
+{{--                    <div id="deduksi_umum_section">--}}
+{{--                        @include('rekapdata.partials.potongan_umum',--}}
+{{--                            ['data_deduksi' => $data_deduksi ?? null])--}}
+{{--                    </div>--}}
                     <div id="deduksi_bpjs_section">
                         @include('rekapdata.partials.potongan_bpjs',
                             ['data_bpjs_kesehatan' => $data_bpjs_kesehatan ?? null,

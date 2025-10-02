@@ -119,19 +119,19 @@ class RekapDataController extends Controller
         $jumlah_izin = $user->Cuti->whereBetween('tanggal', [$mulai, $akhir])->where('nama_cuti', 'Izin Masuk')->where('status_cuti', 'Diterima')->count();
         $jumlah_terlambat = $user->MappingShift->whereBetween('tanggal', [$mulai, $akhir])->where('telat', '>', 0)->count();
         $jumlah_mangkir = $user->MappingShift->whereBetween('tanggal', [$mulai, $akhir])->where('status_absen', 'Tidak Masuk')->count();
-        $gajiPokok = $dataKaryawan['dynamicUpah'];
+        $gajiPokok = $dataKaryawan['upah'];
 
         if ($dataKaryawan['bpjsKetenagakerjaan'] !== null) {
             $dataKaryawan['bpjsKetenagakerjaan'] = $this->prosesPotonganJaminan(
                 $dataKaryawan['bpjsKetenagakerjaan'],
-                $gajiPokok[0]['jumlah']
+                $gajiPokok[0]['gaji_pokok']
             );
         }
 
         if($dataKaryawan['bpjsKetenagakerjaanJkk'] !== null) {
             $dataKaryawan['bpjsKetenagakerjaanJkk'] = $this->prosesPotonganJaminan(
                 $dataKaryawan['bpjsKetenagakerjaanJkk'],
-                $gajiPokok[0]['jumlah']
+                $gajiPokok[0]['gaji_pokok']
             );
         }
 
@@ -151,7 +151,8 @@ class RekapDataController extends Controller
             'jumlah_mangkir' => $jumlah_mangkir,
             'no_gaji' => $no_gaji,
             'data_cuti_izin' => $dataKaryawan['cuti_izin'],
-            'data_dynamic_upah' => $dataKaryawan['dynamicUpah'],
+            'data_upah' => $dataKaryawan['upah'],
+//            'data_dynamic_upah' => $dataKaryawan['dynamicUpah'],
             'data_deduksi' => $dataKaryawan['deduksi'],
             'data_bpjs_kesehatan' => $dataKaryawan['bpjsKesehatan'],
             'data_bpjs_ketenagakerjaan' => $dataKaryawan['bpjsKetenagakerjaan'],
