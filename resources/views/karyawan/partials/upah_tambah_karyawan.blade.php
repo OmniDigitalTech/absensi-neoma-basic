@@ -6,7 +6,12 @@
         <div class="col mb-4">
             <label for="gaji_pokok">Gaji Pokok</label>
             <div class="input-group mb-3">
-                <input type="text" class="form-control money @error('gaji_pokok') is-invalid @enderror" name="gaji_pokok" value="{{ old('gaji_pokok') }}">
+                <div class="input-group-prepend">
+                    <div class="input-group-text">
+                        <span>Rp.</span>
+                    </div>
+                </div>
+                <input type="text" class="form-control money @error('gaji_pokok') is-invalid @enderror" name="gaji_pokok" value="{{ number_format($data_upah[0]->gaji_pokok, 0, ',', '.') }}" disabled>
                 <div class="input-group-append">
                     <div class="input-group-text">
                         <span>/ Bulan</span>
@@ -20,27 +25,53 @@
             </div>
         </div>
         <div class="col mb-4">
-            <label for="makan_transport">Makan Dan Transport</label>
+            <label for="kehadiran">100% Kehadiran</label>
             <div class="input-group mb-3">
-                <input type="text" class="form-control money @error('makan_transport') is-invalid @enderror" name="makan_transport" value="{{ old('makan_transport') }}">
+                <div class="input-group-prepend">
+                    <div class="input-group-text">
+                        <span>Rp.</span>
+                    </div>
+                </div>
+                <input type="text" class="form-control money @error('kehadiran') is-invalid @enderror" name="kehadiran" value="{{ number_format($data_upah[0]->kehadiran, 0, ',', '.') }}" disabled>
                 <div class="input-group-append">
                     <div class="input-group-text">
                         <span>/ Bulan</span>
                     </div>
                 </div>
-                @error('makan_transport')
+                @error('kehadiran')
                 <div class="invalid-feedback">
                     {{ $message }}
                 </div>
                 @enderror
             </div>
         </div>
+{{--        <div class="col mb-4">--}}
+{{--            <label for="makan_transport">Makan Dan Transport</label>--}}
+{{--            <div class="input-group mb-3">--}}
+{{--                <input type="text" class="form-control money @error('makan_transport') is-invalid @enderror" name="makan_transport" value="{{ old('makan_transport') }}">--}}
+{{--                <div class="input-group-append">--}}
+{{--                    <div class="input-group-text">--}}
+{{--                        <span>/ Bulan</span>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+{{--                @error('makan_transport')--}}
+{{--                <div class="invalid-feedback">--}}
+{{--                    {{ $message }}--}}
+{{--                </div>--}}
+{{--                @enderror--}}
+{{--            </div>--}}
+{{--        </div>--}}
     </div>
     <div class="form-row">
         <div class="col mb-4">
             <label for="lembur">Lembur</label>
             <div class="input-group mb-3">
-                <input type="text" class="form-control money @error('lembur') is-invalid @enderror" name="lembur" value="{{ old('lembur') }}">
+                <div class="input-group-prepend">
+                    <div class="input-group-text">
+                        <span>Rp.</span>
+                    </div>
+                </div>
+                <input type="text" class="form-control money @error('lembur') is-invalid @enderror" name="lembur" value="{{ number_format($data_upah[0]->lembur, 0, ',', '.') }}" disabled>
                 <div class="input-group-append">
                     <div class="input-group-text">
                         <span>/ Jam</span>
@@ -54,15 +85,20 @@
             </div>
         </div>
         <div class="col mb-4">
-            <label for="kehadiran">100% Kehadiran</label>
+            <label for="oncall">On Call</label>
             <div class="input-group mb-3">
-                <input type="text" class="form-control money @error('kehadiran') is-invalid @enderror" name="kehadiran" value="{{ old('kehadiran') }}">
-                <div class="input-group-append">
+                <div class="input-group-prepend">
                     <div class="input-group-text">
-                        <span>/ Bulan</span>
+                        <span>Rp.</span>
                     </div>
                 </div>
-                @error('kehadiran')
+                <input type="text" class="form-control money @error('oncall') is-invalid @enderror" name="oncall" value="{{ number_format($data_upah[0]->oncall, 0, ',', '.') }}" disabled>
+                <div class="input-group-append">
+                    <div class="input-group-text">
+                        <span>/ Jam</span>
+                    </div>
+                </div>
+                @error('oncall')
                 <div class="invalid-feedback">
                     {{ $message }}
                 </div>
@@ -71,38 +107,38 @@
         </div>
     </div>
     <div class="form-row">
-        <div class="col mb-4">
-            <label for="thr">THR</label>
-            <div class="input-group mb-3">
-                <input type="text" class="form-control money @error('thr') is-invalid @enderror" name="thr" value="{{ old('thr') }}">
-                <div class="input-group-append">
-                    <div class="input-group-text">
-                        <span>/ Bulan</span>
-                    </div>
-                </div>
-                @error('thr')
-                <div class="invalid-feedback">
-                    {{ $message }}
-                </div>
-                @enderror
-            </div>
-        </div>
-        <div class="col mb-4">
-            <label for="bonus">Bonus</label>
-            <div class="input-group mb-3">
-                <input type="text" class="form-control money @error('bonus') is-invalid @enderror" name="bonus" value="{{ old('bonus') }}">
-                <div class="input-group-append">
-                    <div class="input-group-text">
-                        <span>/ Bulan</span>
-                    </div>
-                </div>
-                @error('bonus')
-                <div class="invalid-feedback">
-                    {{ $message }}
-                </div>
-                @enderror
-            </div>
-        </div>
+{{--        <div class="col mb-4">--}}
+{{--            <label for="thr">THR</label>--}}
+{{--            <div class="input-group mb-3">--}}
+{{--                <input type="text" class="form-control money @error('thr') is-invalid @enderror" name="thr" value="{{ old('thr') }}">--}}
+{{--                <div class="input-group-append">--}}
+{{--                    <div class="input-group-text">--}}
+{{--                        <span>/ Bulan</span>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+{{--                @error('thr')--}}
+{{--                <div class="invalid-feedback">--}}
+{{--                    {{ $message }}--}}
+{{--                </div>--}}
+{{--                @enderror--}}
+{{--            </div>--}}
+{{--        </div>--}}
+{{--        <div class="col mb-4">--}}
+{{--            <label for="bonus">Bonus</label>--}}
+{{--            <div class="input-group mb-3">--}}
+{{--                <input type="text" class="form-control money @error('bonus') is-invalid @enderror" name="bonus" value="{{ old('bonus') }}">--}}
+{{--                <div class="input-group-append">--}}
+{{--                    <div class="input-group-text">--}}
+{{--                        <span>/ Bulan</span>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+{{--                @error('bonus')--}}
+{{--                <div class="invalid-feedback">--}}
+{{--                    {{ $message }}--}}
+{{--                </div>--}}
+{{--                @enderror--}}
+{{--            </div>--}}
+{{--        </div>--}}
     </div>
 @else
     <div class="form-row">

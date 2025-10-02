@@ -198,10 +198,10 @@ class DatabaseSeeder extends Seeder
 
         Upah::create([
             'golongan_id' => 5,
-            'gaji_pokok' => '5000000',
-            'kehadiran' => '500000',
-            'lembur' => '50000',
-            'oncall' => '50000',
+            'gaji_pokok' => '3000000',
+            'kehadiran' => '300000',
+            'lembur' => '30000',
+            'oncall' => '30000',
         ]);
 
         Deduksi::create([

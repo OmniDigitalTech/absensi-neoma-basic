@@ -226,7 +226,7 @@
                                             <ul class="sidebar-submenu">
                                                 <li><a href="{{ url('/tunjangan') }}">Tunjangan</a></li>
                                                 <li><a href="{{ url('/upah') }}">Upah</a></li>
-                                                <li><a href="{{ url('/dynamic-upah') }}">Dynamic Upah</a></li>
+{{--                                                <li><a href="{{ url('/dynamic-upah') }}">Dynamic Upah</a></li>--}}
                                                 <li><a href="{{ url('/deduksi') }}">Pengurangan Gaji</a></li>
                                                 <li><a href="{{ url('/bpjs') }}">BPJS</a></li>
                                             </ul>

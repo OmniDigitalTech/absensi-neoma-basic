@@ -317,7 +317,8 @@
                         @include('karyawan.partials.cuti_izin_tambah_karyawan', ['cutiIzin' => $data_cuti_izin ?? null])
                     </div>
                     <div id="upah_section">
-                        @include('karyawan.partials.dynamic_upah_tambah_karyawan', ['dynamicUpah' => $data_dynamic_upah ?? null])
+                        @include('karyawan.partials.upah_tambah_karyawan', ['upah' => $data_upah ?? null])
+{{--                        @include('karyawan.partials.dynamic_upah_tambah_karyawan', ['dynamicUpah' => $data_dynamic_upah ?? null])--}}
                     </div>
                     <div id="deduksi_section">
                         @include('karyawan.partials.deduksi_tambah_karyawan',
@@ -353,7 +354,8 @@
                             },
                             success: function(response) {
                                 $('#cuti_izin_section').html(response.cuti_izin_view);
-                                $('#upah_section').html(response.dynamic_upah_view);
+                                $('#upah_section').html(response.upah_view);
+                                // $('#upah_section').html(response.dynamic_upah_view);
                                 $('#deduksi_section').html(response.deduksi_view);
                             },
                             error: function(xhr) {
