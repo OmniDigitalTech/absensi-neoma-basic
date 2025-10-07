@@ -69,55 +69,54 @@
 
 <body>
     @php
-    $settings = App\Models\settings::first();
-    $logo_path = storage_path('app/public/' . $settings->logo);
+        $settings = App\Models\settings::first();
+        $logo_path = storage_path('app/public/' . $settings->logo);
     if (file_exists($logo_path)) {
-    $logo_mime = mime_content_type($logo_path);
-    $logo_data = base64_encode(file_get_contents($logo_path));
+        $logo_mime = mime_content_type($logo_path);
+        $logo_data = base64_encode(file_get_contents($logo_path));
     } else {
-    $logo_mime = null;
-    $logo_data = null;
+        $logo_mime = null;
+        $logo_data = null;
     }
     @endphp
     <div class="container">
         @if($logo_data)
-        <img src="data:{{ $logo_mime }};base64,{{ $logo_data }}" style="width: 80px; float:right" alt="Logo">
+            <img src="data:{{ $logo_mime }};base64,{{ $logo_data }}" style="width: 80px; float:right" alt="Logo">
         @endif
-        <h3 style="text-transform: uppercase;">{{ $settings->name }}</h3>
-        <span style="font-size: 10px; color:rgb(112, 112, 112)">{{ $settings->alamat }}</span>
-        <br>
-        <span style="font-size: 10px; color:rgb(112, 112, 112)">{{ $settings->email }} - ({{ $settings->phone }})</span>
-        <hr>
-        <center>
+            <h3 style="text-transform: uppercase;">{{ $settings->name }}</h3>
+            <span style="font-size: 10px; color:rgb(112, 112, 112)">{{ $settings->alamat }}</span>
+            <br>
+            <span style="font-size: 10px; color:rgb(112, 112, 112)">{{ $settings->email }} - ({{ $settings->phone }})</span>
+            <hr>
+        <div style="text-align: center;">
             <div class="header">Slip Gaji CV. Neoma</div>
-        </center>
-
+        </div>
         @php
-        if ($data->bulan == 1) {
-        $bulan = "Januari";
-        } elseif ($data->bulan == 2) {
-        $bulan = "Februari";
-        } elseif ($data->bulan == 3) {
-        $bulan = "Maret";
-        } elseif ($data->bulan == 4) {
-        $bulan = "April";
-        } elseif ($data->bulan == 5) {
-        $bulan = "Mei";
-        } elseif ($data->bulan == 6) {
-        $bulan = "Juni";
-        } elseif ($data->bulan == 7) {
-        $bulan = "Juli";
-        } elseif ($data->bulan == 8) {
-        $bulan = "Agustus";
-        } elseif ($data->bulan == 9) {
-        $bulan = "September";
-        } elseif ($data->bulan == 10) {
-        $bulan = "Oktober";
-        } elseif ($data->bulan == 11) {
-        $bulan = "November";
-        } else {
-        $bulan = "Desember";
-        }
+            if ($data_payroll->bulan === 1) {
+                $bulan = "Januari";
+            } elseif ($data_payroll->bulan === 2) {
+                $bulan = "Februari";
+            } elseif ($data_payroll->bulan === 3) {
+                $bulan = "Maret";
+            } elseif ($data_payroll->bulan === 4) {
+                $bulan = "April";
+            } elseif ($data_payroll->bulan === 5) {
+                $bulan = "Mei";
+            } elseif ($data_payroll->bulan === 6) {
+                $bulan = "Juni";
+            } elseif ($data_payroll->bulan === 7) {
+                $bulan = "Juli";
+            } elseif ($data_payroll->bulan === 8) {
+                $bulan = "Agustus";
+            } elseif ($data_payroll->bulan === 9) {
+                $bulan = "September";
+            } elseif ($data_payroll->bulan === 10) {
+                $bulan = "Oktober";
+            } elseif ($data_payroll->bulan === 11) {
+                $bulan = "November";
+            } else {
+                $bulan = "Desember";
+            }
         @endphp
         <div class="row">
             <div class="col">
@@ -126,17 +125,17 @@
                         <tr>
                             <td>Nama</td>
                             <td>:</td>
-                            <td>{{ $data->User->name }}</td>
+                            <td>{{ $data_payroll->User->name }}</td>
                         </tr>
                         <tr>
                             <td>Jabatan</td>
                             <td>:</td>
-                            <td>{{ $data->User->jabatan->nama_jabatan }}</td>
+                            <td>{{ $data_payroll->User->jabatan->nama_jabatan }}</td>
                         </tr>
                         <tr>
                             <td>Rekening</td>
                             <td>:</td>
-                            <td>{{ $data->User->rekening }}</td>
+                            <td>{{ $data_payroll->User->rekening }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -147,12 +146,12 @@
                         <!-- <tr>
                             <td>Tgl Gabung</td>
                             <td>:</td>
-                            <td>{{ $data->User->tgl_join }}</td>
+                            <td>{{ $data_payroll->User->tgl_join }}</td>
                         </tr> -->
                         <tr>
                             <td>Bulan</td>
                             <td>:</td>
-                            <td>{{ $bulan . ' ' . $data->tahun }}</td>
+                            <td>{{ $bulan . ' ' . $data_payroll->tahun }}</td>
                         </tr>
                         <tr>
                             <td>Tgl Cetak Slip</td>
@@ -175,14 +174,14 @@
                     <td style="padding-left: 10px; padding-right: 10px">:</td>
                     <td style="padding-left: 10px; padding-right: 10px"></td>
                     <td style="padding-left: 10px; padding-right: 10px"></td>
-                    <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data->gaji_pokok) }}</td>
+                    <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data_payroll->gaji_pokok) }}</td>
                 </tr>
                 <tr>
                     <td style="padding-left: 10px; padding-right: 10px">Uang Makan & Transport</td>
                     <td style="padding-left: 10px; padding-right: 10px">:</td>
                     <td style="padding-left: 10px; padding-right: 10px"></td>
                     <td style="padding-left: 10px; padding-right: 10px"></td>
-                    <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data->uang_transport) }}
+                    <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data_payroll->uang_transport) }}
                     </td>
                 </tr>
                 <tr>
@@ -190,29 +189,36 @@
                     <td style="padding-left: 10px; padding-right: 10px">:</td>
                     <td style="padding-left: 10px; padding-right: 10px"></td>
                     <td style="padding-left: 10px; padding-right: 10px"></td>
-                    <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data->total_kehadiran) }}
+                    <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data_payroll->total_kehadiran) }}
                     </td>
                 </tr>
                 <tr>
                     <td style="padding-left: 10px; padding-right: 10px">Lembur</td>
                     <td style="padding-left: 10px; padding-right: 10px">:</td>
-                    <td style="padding-left: 10px; padding-right: 10px">{{ $data->jumlah_lembur }}</td>
+                    <td style="padding-left: 10px; padding-right: 10px">{{ $data_payroll->jumlah_lembur }}</td>
                     <td style="padding-left: 10px; padding-right: 10px">Jam</td>
-                    <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data->total_lembur) }}</td>
+                    <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data_payroll->total_lembur) }}</td>
+                </tr>
+                <tr>
+                    <td style="padding-left: 10px; padding-right: 10px">On Call</td>
+                    <td style="padding-left: 10px; padding-right: 10px">:</td>
+                    <td style="padding-left: 10px; padding-right: 10px">{{ $data_payroll->jumlah_oncall }}</td>
+                    <td style="padding-left: 10px; padding-right: 10px">Jam</td>
+                    <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data_payroll->total_oncall) }}</td>
                 </tr>
                 <tr>
                     <td style="padding-left: 10px; padding-right: 10px">Insentif</td>
                     <td style="padding-left: 10px; padding-right: 10px">:</td>
                     <td style="padding-left: 10px; padding-right: 10px"></td>
                     <td style="padding-left: 10px; padding-right: 10px"></td>
-                    <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data->total_bonus) }}</td>
+                    <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data_payroll->total_bonus) }}</td>
                 </tr>
                 <tr>
                     <td style="padding-left: 10px; padding-right: 10px">Tunjangan Hari Raya</td>
                     <td style="padding-left: 10px; padding-right: 10px">:</td>
                     <td style="padding-left: 10px; padding-right: 10px"></td>
                     <td style="padding-left: 10px; padding-right: 10px"></td>
-                    <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data->total_thr) }}</td>
+                    <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data_payroll->total_thr) }}</td>
                 </tr>
                 <tr>
                     <td style="padding-left: 10px; padding-right: 10px"></td>
@@ -226,7 +232,7 @@
                     <td style="padding-left: 10px; padding-right: 10px">:</td>
                     <td style="padding-left: 10px; padding-right: 10px"></td>
                     <td style="padding-left: 10px; padding-right: 10px"></td>
-                    <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data->total_penjumlahan) }}
+                    <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data_payroll->total_penjumlahan) }}
                     </td>
                 </tr>
             </tbody>
@@ -241,41 +247,72 @@
                 <tr>
                     <td style="padding-left: 10px; padding-right: 17px">Keterlambatan</td>
                     <td style="padding-left: 10px; padding-right: 10px">:</td>
-                    <td style="padding-left: 10px; padding-right: 10px">{{ $data->jumlah_terlambat }}</td>
+                    <td style="padding-left: 10px; padding-right: 10px">{{ $data_payroll->jumlah_terlambat }}</td>
                     <td style="padding-left: 10px; padding-right: 10px">Kali</td>
-                    <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data->total_terlambat) }}
+                    <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data_payroll->total_terlambat) }}
                     </td>
                 </tr>
                 <tr>
                     <td style="padding-left: 10px; padding-right: 17px">Mangkir</td>
                     <td style="padding-left: 10px; padding-right: 10px">:</td>
-                    <td style="padding-left: 10px; padding-right: 10px">{{ $data->jumlah_mangkir }}</td>
+                    <td style="padding-left: 10px; padding-right: 10px">{{ $data_payroll->jumlah_mangkir }}</td>
                     <td style="padding-left: 10px; padding-right: 10px">Hari</td>
-                    <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data->total_mangkir) }}
+                    <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data_payroll->total_mangkir) }}
                     </td>
                 </tr>
                 <tr>
                     <td style="padding-left: 10px; padding-right: 17px">Izin</td>
                     <td style="padding-left: 10px; padding-right: 10px">:</td>
-                    <td style="padding-left: 10px; padding-right: 10px">{{ $data->jumlah_izin }}</td>
+                    <td style="padding-left: 10px; padding-right: 10px">{{ $data_payroll->jumlah_izin }}</td>
                     <td style="padding-left: 10px; padding-right: 10px">Hari</td>
-                    <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data->total_izin) }}</td>
+                    <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data_payroll->total_izin) }}</td>
                 </tr>
                 <br>
-                <tr>
-                    <td style="padding-left: 10px; padding-right: 17px">Kasbon</td>
-                    <td style="padding-left: 10px; padding-right: 10px">:</td>
-                    <td style="padding-left: 10px; padding-right: 10px"></td>
-                    <td style="padding-left: 10px; padding-right: 10px"></td>
-                    <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data->bayar_kasbon) }}</td>
-                </tr>
-                <tr>
-                    <td style="padding-left: 10px; padding-right: 17px">Loss</td>
-                    <td style="padding-left: 10px; padding-right: 10px">:</td>
-                    <td style="padding-left: 10px; padding-right: 10px"></td>
-                    <td style="padding-left: 10px; padding-right: 10px"></td>
-                    <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data->loss) }}</td>
-                </tr>
+{{--                <tr>--}}
+{{--                    <td style="padding-left: 10px; padding-right: 17px">Kasbon</td>--}}
+{{--                    <td style="padding-left: 10px; padding-right: 10px">:</td>--}}
+{{--                    <td style="padding-left: 10px; padding-right: 10px"></td>--}}
+{{--                    <td style="padding-left: 10px; padding-right: 10px"></td>--}}
+{{--                    <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data_payroll->bayar_kasbon) }}</td>--}}
+{{--                </tr>--}}
+{{--                <tr>--}}
+{{--                    <td style="padding-left: 10px; padding-right: 17px">Loss</td>--}}
+{{--                    <td style="padding-left: 10px; padding-right: 10px">:</td>--}}
+{{--                    <td style="padding-left: 10px; padding-right: 10px"></td>--}}
+{{--                    <td style="padding-left: 10px; padding-right: 10px"></td>--}}
+{{--                    <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data_payroll->loss) }}</td>--}}
+{{--                </tr>--}}
+                @if(!empty($data_bpjs_ketenagakerjaan))
+                    <tr>
+                        <td style="padding-left: 10px; padding-right: 17px">BPJS Kesehatan</td>
+                        <td style="padding-left: 10px; padding-right: 10px">:</td>
+                        <td style="padding-left: 10px; padding-right: 10px">{{ $data_bpjs_kesehatan[0]['kelas'] }}</td>
+                        <td style="padding-left: 10px; padding-right: 10px">Kelas</td>
+                        <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data_payroll->potongan_bpjs_kesehatan) }}</td>
+                    </tr>
+                @endif
+                @if(!empty($data_bpjs_ketenagakerjaan))
+                    @foreach($data_bpjs_ketenagakerjaan as $bpjs_ketenagakerjaan)
+                        <tr>
+                            <td style="padding-left: 10px; padding-right: 17px">{{ $bpjs_ketenagakerjaan->name }}</td>
+                            <td style="padding-left: 10px; padding-right: 10px">:</td>
+                            <td style="padding-left: 10px; padding-right: 10px">{{ $bpjs_ketenagakerjaan->nominal }}</td>
+                            <td style="padding-left: 10px; padding-right: 10px">%</td>
+                            <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($bpjs_ketenagakerjaan->nilai_potongan) }}</td>
+                        </tr>
+                    @endforeach
+                    @if(!empty($data_bpjs_ketenagakerjaan_jkk))
+                        @foreach($data_bpjs_ketenagakerjaan_jkk as $bpjs_ketenagakerjaan_jkk)
+                            <tr>
+                                <td style="padding-left: 10px; padding-right: 17px">Jaminan Kecelakaan<br>Kerja - {{ $bpjs_ketenagakerjaan_jkk->name }}</td>
+                                <td style="padding-left: 10px; padding-right: 10px">:</td>
+                                <td style="padding-left: 10px; padding-right: 10px">{{ $bpjs_ketenagakerjaan_jkk->nominal }}</td>
+                                <td style="padding-left: 10px; padding-right: 10px">%</td>
+                                <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data_payroll->potongan_Jaminan_Kecelakaan_Kerja) }}</td>
+                            </tr>
+                        @endforeach
+                    @endif
+                @endif
                 <tr>
                     <td style="padding-left: 10px; padding-right: 17px"></td>
                     <td style="padding-left: 10px; padding-right: 10px"></td>
@@ -288,7 +325,7 @@
                     <td style="padding-left: 10px; padding-right: 10px">:</td>
                     <td style="padding-left: 10px; padding-right: 10px"></td>
                     <td style="padding-left: 10px; padding-right: 10px"></td>
-                    <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data->total_pengurangan) }}
+                    <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data_payroll->total_pengurangan) }}
                     </td>
                 </tr>
                 <br>
@@ -298,13 +335,13 @@
                     <td style="padding-left: 10px; padding-right: 10px"></td>
                     <td style="padding-left: 10px; padding-right: 10px"></td>
                     <td style="padding-left: 10px; padding-right: 10px; font-weight: bold; border: 1px solid #000;">Rp
-                        {{ number_format($data->grand_total) }}</td>
+                        {{ number_format($data_payroll->grand_total) }}</td>
                 </tr>
                 <br>
                 <tr>
                     <td style="padding-left: 10px; padding-right: 17px">Sisa Cuti</td>
                     <td style="padding-left: 10px; padding-right: 10px">:</td>
-                    <td style="padding-left: 10px; padding-right: 10px">{{ $data->User->izin_cuti }}</td>
+                    <td style="padding-left: 10px; padding-right: 10px">{{ $sisa_cuti }}</td>
                     <td style="padding-left: 10px; padding-right: 10px">Kali</td>
                     <td style="padding-left: 10px; padding-right: 10px">/ Tahun</td>
                 </tr>

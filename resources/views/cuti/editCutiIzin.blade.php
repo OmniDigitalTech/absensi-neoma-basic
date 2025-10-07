@@ -21,7 +21,7 @@
                     <div class="form-row">
                         <div class="col mb-4">
                             <label for="nama">Nama Cuti</label>
-                            <input type="text" class="form-control" value="{{ $data_cuti_izin->nama }}" name="nama" id="nama">
+                            <input type="text" class="form-control" value="{{ $data_cuti_izin->nama }}" name="nama" id="nama" disabled>
                         </div>
                     </div>
                     <div class="form-row">

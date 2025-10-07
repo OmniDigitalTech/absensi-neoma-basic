@@ -569,7 +569,7 @@
                     let bpjs_ketenagakerjaan_jp = $('#potongan_Jaminan_Pensiun').val() ? parseFloat(replaceCurrency($('#potongan_Jaminan_Pensiun').val())) : 0;
                     let bpjs_ketenagakerjaan_jk = $('#potongan_Jaminan_Kematian').val() ? parseFloat(replaceCurrency($('#potongan_Jaminan_Kematian').val())) : 0;
                     let bpjs_ketenagakerjaan_jkp = $('#potongan_Jaminan_Kehilangan_Pekerjaan').val() ? parseFloat(replaceCurrency($('#potongan_Jaminan_Kehilangan_Pekerjaan').val())) : 0;
-                    let bpjs_ketenagakerjaan_jkk = $('#potongan_bpjs_ketenagakerjaan_jkk').val() ? parseFloat(replaceCurrency($('#potongan_bpjs_ketenagakerjaan_jkk').val())) : 0;
+                    let bpjs_ketenagakerjaan_jkk = $('#potongan_Jaminan_Kecelakaan_Kerja').val() ? parseFloat(replaceCurrency($('#potongan_Jaminan_Kecelakaan_Kerja').val())) : 0;
 
                     // var total_pengurangan = total_mangkir + total_izin + total_terlambat + bayar_kasbon + loss;
                     var total_pengurangan = total_mangkir + total_izin + total_terlambat + bpjs_kesehatan + bpjs_ketenagakerjaan_jht + bpjs_ketenagakerjaan_jp + bpjs_ketenagakerjaan_jk + bpjs_ketenagakerjaan_jkp + bpjs_ketenagakerjaan_jkk;

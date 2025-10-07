@@ -16,7 +16,8 @@
         "pusher/pusher-php-server": "^7.2",
         "realrashid/sweet-alert": "^7.0",
         "spatie/laravel-web-tinker": "^1.8",
-        "ext-json": "*"
+        "ext-json": "*",
+        "ext-fileinfo": "*"
     },
     "require-dev": {
         "spatie/laravel-ignition": "^2.0",

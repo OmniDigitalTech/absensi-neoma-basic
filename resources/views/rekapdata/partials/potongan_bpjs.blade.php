@@ -26,7 +26,7 @@
                     @endphp
                     <div class="col mb-4">
                         <div class="card p-4">
-                            <label for="{{ $namaBpjsKetenagakerjaan }}">{{ ucfirst($deduksiBpjsKetenagakerjaan->name) }}</label>
+                            <label for="{{ $namaBpjsKetenagakerjaan }}">{{ $deduksiBpjsKetenagakerjaan->name }}</label>
                             <div class="input-group mb-3">
                                 <input type="text" class="form-control @error($namaBpjsKetenagakerjaan) is-invalid @enderror"
                                        name="{{ $namaBpjsKetenagakerjaan }}" id="{{ $namaBpjsKetenagakerjaan }}" style="background-color: orange"
@@ -66,7 +66,7 @@
                     @endphp
                     <div class="col mb-4">
                         <div class="card p-4">
-                            <label for="bpjs_ketenagakerjaan_jkk_{{ $namaBpjsKetenagakerjaanJkk }}">Jaminan Kecelakaan Kerja - {{ ucfirst($deduksiBpjsKetenagakerjaanJkk->name) }}</label>
+                            <label for="bpjs_ketenagakerjaan_jkk_{{ $namaBpjsKetenagakerjaanJkk }}">Jaminan Kecelakaan Kerja - {{ $deduksiBpjsKetenagakerjaanJkk->name }}</label>
                             <div class="input-group mb-3">
                                 <input type="text" class="form-control @error($namaBpjsKetenagakerjaanJkk) is-invalid @enderror"
                                        name="bpjs_ketenagakerjaan_jkk_{{ $namaBpjsKetenagakerjaanJkk }}" id="bpjs_ketenagakerjaan_jkk_{{ $namaBpjsKetenagakerjaanJkk }}" style="background-color: orange"

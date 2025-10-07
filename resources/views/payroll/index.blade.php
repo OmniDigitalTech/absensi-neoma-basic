@@ -111,7 +111,7 @@
                                 <th>Nama</th>
                                 <th>Jabatan</th>
                                 <th>Bulan</th>
-                                <th>Kasbon</th>
+{{--                                <th>Kasbon</th>--}}
                                 <th>Grand Total</th>
                                 <th>Actions</th>
                             </tr>
@@ -155,7 +155,7 @@
                                     @endphp
                                     {{ $nama_bulan  }} {{ $d->tahun }}
                                 </td>
-                                <td>Rp {{ number_format($d->bayar_kasbon) }}</td>
+{{--                                <td>Rp {{ number_format($d->bayar_kasbon) }}</td>--}}
                                 <td>Rp {{ number_format($d->grand_total) }}</td>
                                 <td>
                                     <ul class="action">
@@ -178,6 +178,7 @@
                                                 <button class="border-0 delete-btn" data-item-name="data gaji"
                                                     style="background-color: transparent;"> <i
                                                         class="fa fa-solid fa-trash"></i>
+                                                </button>
                                             </form>
                                         </li>
                                         @endcan
