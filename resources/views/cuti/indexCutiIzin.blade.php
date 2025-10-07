@@ -14,11 +14,11 @@
         </div>
     </div>
     <div class="card">
-        <div class="card-header">
-            <center>
-                <a href="{{ url('/data-cuti/tambah-cuti-izin') }}" class="btn btn-primary">+ Tambah Data Cuti & Izin</a>
-            </center>
-        </div>
+{{--        <div class="card-header">--}}
+{{--            <div style="text-align: center;">--}}
+{{--                <a href="{{ url('/data-cuti/tambah-cuti-izin') }}" class="btn btn-primary">+ Tambah Data Cuti & Izin</a>--}}
+{{--            </div>--}}
+{{--        </div>--}}
         <!-- /.card-header -->
         <div class="card-body">
             <table id="tableprint" class="table table-bordered table-striped">
@@ -38,11 +38,11 @@
                         <td>{{ number_format($d->jumlah) }} Kali / Tahun</td>
                         <td>
                             <a href="{{ url('/data-cuti/edit-cuti-izin/'.$d->id) }}" class="btn btn-sm btn-warning"><i class="fa fa-solid fa-edit"></i></a>
-                            <form action="{{ url('/data-cuti/delete-cuti-izin/'.$d->id) }}" method="post" class="d-inline">
-                                @method('delete')
-                                @csrf
-                                <button class="btn btn-danger btn-sm btn-circle delete-btn" data-item-name="data cuti izin"><i class="fa fa-solid fa-trash"></i></button>
-                            </form>
+{{--                            <form action="{{ url('/data-cuti/delete-cuti-izin/'.$d->id) }}" method="post" class="d-inline">--}}
+{{--                                @method('delete')--}}
+{{--                                @csrf--}}
+{{--                                <button class="btn btn-danger btn-sm btn-circle delete-btn" data-item-name="data cuti izin"><i class="fa fa-solid fa-trash"></i></button>--}}
+{{--                            </form>--}}
                         </td>
                     </tr>
                 @endforeach

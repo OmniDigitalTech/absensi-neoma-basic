@@ -2,48 +2,77 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DataCuti;
 use App\Models\User;
 use App\Models\Payroll;
 use App\Models\StatusPtkp;
+use App\Services\KaryawanService;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class PayrollController extends Controller
 {
+    protected $karyawanService;
+
+    public function __construct(KaryawanService $karyawanService)
+    {
+        $this->middleware('auth');
+        $this->karyawanService = $karyawanService;
+    }
+
     public function index()
     {
         $bulan = request()->input('bulan');
         $tahun = request()->input('tahun');
-        if (auth()->user()->is_admin == 'admin') {
-            $data = Payroll::when($bulan, function ($query) use ($bulan) {
-                                return $query->where('bulan', $bulan);
-                            })
-                            ->when($tahun, function ($query) use ($tahun) {
-                                return $query->where('tahun', $tahun);
-                            })
-                            ->orderBy('no_gaji', 'DESC');
-                            
-            return view('payroll.index', [
-                'title' => 'Payroll',
-                'data' => $data->paginate(10)->withQueryString()
-            ]);
-        } else {
-            $data = Payroll::where('user_id', auth()->user()->id)
-                            ->when($bulan, function ($query) use ($bulan) {
-                                return $query->where('bulan', $bulan);
-                            })
-                            ->when($tahun, function ($query) use ($tahun) {
-                                return $query->where('tahun', $tahun);
-                            })
-                            ->orderBy('no_gaji', 'DESC');
-                            
-            return view('payroll.indexuser', [
-                'title' => 'Data Penggajian Karyawan',
-                'data' => $data->paginate(10)->withQueryString()
-            ]);
-        }
 
-        
+        $query = Payroll::query();
+
+        if (auth()->user()->is_admin === 'admin') {
+//            $data = Payroll::when($bulan, function ($query) use ($bulan) {
+//                                return $query->where('bulan', $bulan);
+//                            })
+//                            ->when($tahun, function ($query) use ($tahun) {
+//                                return $query->where('tahun', $tahun);
+//                            })
+//                            ->orderBy('no_gaji', 'DESC');
+//
+//            return view('payroll.index', [
+//                'title' => 'Payroll',
+//                'data' => $data->paginate(10)->withQueryString()
+//            ]);
+            $query->where('user_id', auth()->user()->id);
+        }
+//         else {
+//        $data = Payroll::where('user_id', auth()->user()->id)
+//                        ->when($bulan, function ($query) use ($bulan) {
+//                            return $query->where('bulan', $bulan);
+//                        })
+//                        ->when($tahun, function ($query) use ($tahun) {
+//                            return $query->where('tahun', $tahun);
+//                        })
+//                        ->orderBy('no_gaji', 'DESC');
+//        }
+        $data = $query->when($bulan, function ($q) use ($bulan) {
+                            return $q->where('bulan', $bulan);
+                        })
+                        ->when($tahun, function ($q) use ($tahun) {
+                            return $q->where('tahun', $tahun);
+                        })
+                        ->orderBy('no_gaji', 'DESC')
+                        ->paginate(10)
+                        ->withQueryString();
+
+        $viewName = auth()->user()->is_admin === 'admin' ? 'payroll.index' : 'payroll.indexuser';
+        $title = auth()->user()->is_admin === 'admin' ? 'Payroll' : 'Data Penggajian Karyawan';
+
+//        return view('payroll.indexuser', [
+//            'title' => 'Data Penggajian Karyawan',
+//            'data' => $data->paginate(10)->withQueryString()
+//        ]);
+        return view($viewName, [
+            'title' => $title,
+            'data' => $data
+        ]);
     }
 
     public function tambah()
@@ -89,7 +118,7 @@ class PayrollController extends Controller
         if(!$validated['setoran_bpjs_tk']){
             $validated['setoran_bpjs_tk'] = 0;
         }
-        
+
         if(!$validated['tunjangan_bpjs_tk']){
             $validated['tunjangan_bpjs_tk'] = 0;
         }
@@ -202,12 +231,12 @@ class PayrollController extends Controller
         $user = User::find($request['user_id']);
         $user->update(['saldo_kasbon' => $user->saldo_kasbon + $payroll->bayar_kasbon]);
         $payroll->update($validated);
-        
+
         $user->update(['saldo_kasbon' => $user->saldo_kasbon - $validated['bayar_kasbon']]);
-        
+
         return redirect('payroll')->with('success', 'Data Berhasil Diupdate');
     }
-    
+
     public function delete($id)
     {
         $payroll = Payroll::find($id);
@@ -216,14 +245,47 @@ class PayrollController extends Controller
         $payroll->delete();
         return redirect('/payroll')->with('success', 'Data Berhasil di Hapus');
     }
-    
+
     public function download($id)
     {
+        $payroll = Payroll::query()->find($id);
+        $user = User::query()->find($payroll->user_id);
+
+        $dataKaryawan = $this->karyawanService->getCutiIzinUpahDeduksiKaryawan($user->golongan_id, $user->tipe_karyawan);
+        $dataPayroll = Payroll::query()->find($id);
+        $modifiedBpjsKetenagakerjaan = $this->modifyPayrollData($dataKaryawan['bpjsKetenagakerjaan'], collect($dataPayroll));
+//        $modifiedBpjsKetenagakerjaanJkk = $this->modifyPayrollData($dataKaryawan['bpjsKetenagakerjaanJkk'], collect($dataPayroll));
+
+        $dataCutiIzin = DataCuti::query()->get();
+//        dd($dataCutiIzin);
+        $sisa_cuti = $dataPayroll->User->izin_cuti ?? $dataCutiIzin[0]['jumlah'];
+//        dd($sisa_cuti);
         $pdf = Pdf::loadView('payroll.download', [
             'title' => 'Penggajian',
-            'data' => Payroll::find($id)
+            'data_payroll' => $dataPayroll,
+            'data_bpjs_kesehatan' => $dataKaryawan['bpjsKesehatan'],
+            'data_bpjs_ketenagakerjaan' => $modifiedBpjsKetenagakerjaan,
+            'data_bpjs_ketenagakerjaan_jkk' => $dataKaryawan['bpjsKetenagakerjaanJkk'],
+            'sisa_cuti' => $sisa_cuti,
         ]);
 
         return $pdf->stream();
+    }
+
+    private function modifyPayrollData($collectionLengkap, $collectionPayroll) {
+        return $collectionLengkap->map(function ($item) use ($collectionPayroll) {
+            // 1. Ambil nama asli dari item collection (misal: "Jaminan Hari Tua")
+            $namaAsli = $item->name;
+            // 2. Buat 'kunci dinamis' yang cocok dengan format array potongan
+            //    ("Jaminan Hari Tua" -> "potongan_Jaminan_Hari_Tua")
+            $kunciDinamis = 'potongan_' . str_replace(' ', '_', $namaAsli);
+            // 3. Cek apakah kunci ini ada di data potongan.
+            //    Jika ada, ambil nilainya. Jika tidak, beri nilai default 0.
+            $nilaiPotongan = $collectionPayroll[$kunciDinamis] ?? 0;
+            // 4. Tambahkan nilai potongan sebagai properti BARU ke dalam item
+            $item->nilai_potongan = $nilaiPotongan;
+            // 5. Kembalikan item yang sudah diperkaya
+            return $item;
+        });
     }
 }

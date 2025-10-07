@@ -61,7 +61,7 @@ class RekapDataController extends Controller
         return (new RekapExport($_GET))->download('List Rekap Data.xlsx');
     }
 
-    private function prosesPotonganJaminan($collection, $gajiPokok)
+    private function prosesPotonganJaminan($collection, $gajiPokok): \Illuminate\Support\Collection
     {
         // Pengaman: jika datanya bukan collection atau kosong, langsung kembalikan apa adanya.
         if (!$collection instanceof \Illuminate\Support\Collection || $collection->isEmpty()) {
@@ -81,10 +81,10 @@ class RekapDataController extends Controller
 
     public function payroll(Request $request, $id)
     {
-        $user = User::find($id);
+        $user = User::query()->find($id);
         $mulai = $request->input('mulai');
         $akhir = $request->input('akhir');
-        $counter = Counter::where('name', 'Gaji')->first();
+        $counter = Counter::query()->where('name', 'Gaji')->first();
         $counter->update(['counter' => $counter->counter + 1]);
         $next_number = str_pad($counter->counter, 6, '0', STR_PAD_LEFT);
         $no_gaji = $counter->text . $next_number;
@@ -105,7 +105,7 @@ class RekapDataController extends Controller
         $presentase_kehadiran = (($jumlah_hadir + $jumlah_izin_telat + $jumlah_izin_pulang_cepat + $libur) / $jumlah_hari) * 100;
 
         // Proses Data Bagian Pendapatan
-        if ($presentase_kehadiran == 100) {
+        if ($presentase_kehadiran === 100) {
             $jumlah_kehadiran = 1;
         } else {
             $jumlah_kehadiran = 0;
@@ -168,7 +168,7 @@ class RekapDataController extends Controller
             return redirect('/rekap-data/get-data?mulai='.$request['mulai'].'&akhir='.$request['akhir'])->with('failed', 'Data Berhasil Disimpan');
         }
 
-//        try {
+        try {
             $validated = $request->validate([
                 'user_id' => 'required',
                 'bulan' => 'required',
@@ -196,12 +196,12 @@ class RekapDataController extends Controller
                 'jumlah_mangkir' => 'required',
                 'uang_mangkir' => 'required',
                 'total_mangkir' => 'required',
-//                'potongan_bpjs_kesehatan' => 'required',
-//                'potongan_Jaminan_Hari_Tua' => 'required',
-//                'potongan_Jaminan_Pensiun' => 'required',
-//                'potongan_Jaminan_Kematian' => 'required',
-//                'potongan_Jaminan_Kehilangan_Pekerjaan' => 'required',
-//                'potongan_Jaminan_Kecelakaan_Kerja' => 'required',
+                'potongan_bpjs_kesehatan' => 'sometimes',
+                'potongan_Jaminan_Hari_Tua' => 'sometimes',
+                'potongan_Jaminan_Pensiun' => 'sometimes',
+                'potongan_Jaminan_Kematian' => 'sometimes',
+                'potongan_Jaminan_Kehilangan_Pekerjaan' => 'sometimes',
+                'potongan_Jaminan_Kecelakaan_Kerja' => 'sometimes',
                 'uang_makan' => 'required',
                 'uang_transport' => 'required',
                 'jumlah_bonus' => 'required',
@@ -215,12 +215,11 @@ class RekapDataController extends Controller
                 'total_pengurangan' => 'required',
                 'grand_total' => 'required',
             ]);
-
-//        } catch (\Exception $e) {
-//            Alert::error('Failed', 'Data Gagal Disimpan!');
-//            Log::info($e);
-//            return redirect('/rekap-data/get-data?mulai='.$request['mulai'].'&akhir='.$request['akhir'])->with('failed', 'Data Berhasil Disimpan');
-//        }
+        } catch (\Exception $e) {
+            Alert::error('Failed', 'Data Gagal Disimpan!');
+            Log::info($e);
+            return redirect('/rekap-data/get-data?mulai='.$request['mulai'].'&akhir='.$request['akhir'])->with('failed', 'Data Berhasil Disimpan');
+        }
 
         $validated['user_id'] = (int) str_replace(',', '', $validated['user_id']);
         $validated['bulan'] = (int) str_replace(',', '', $validated['bulan']);
@@ -266,7 +265,6 @@ class RekapDataController extends Controller
         $validated['total_penjumlahan'] = (int) (str_replace(',', '', $validated['total_penjumlahan']) ?? '0');
         $validated['total_pengurangan'] = (int) (str_replace(',', '', $validated['total_pengurangan']) ?? '0');
         $validated['grand_total'] = (int) (str_replace(',', '', $validated['grand_total']) ?? '0');
-
 
 //        $user = User::find($request['user_id']);
 //        $user->update(['saldo_kasbon' => $user->saldo_kasbon - $validated['bayar_kasbon']]);
