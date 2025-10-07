@@ -1,22 +1,24 @@
 <div class="col mb-4">
     <h4 style="color: blue">BPJS Kesehatan & Ketenagakerjaan</h4>
 </div>
-@if(isset($data_bpjs_kesehatan) && isset($data_bpjs_ketenagakerjaan) && isset($data_bpjs_ketenagakerjaan_jkk))
-    <div class="form-row">
-        <div class="col mb-4">
-            <div class="card p-4">
-                <label for="potongan_bpjs_kesehatan">{{ $data_bpjs_kesehatan[0]['name'] }}</label>
-                <input type="text" class="form-control money @error('bpjs_kesehatan') is-invalid @enderror"
-                       id="potongan_bpjs_kesehatan" name="potongan_bpjs_kesehatan"
-                       value="{{ old('bpjs_kesehatan', number_format($data_bpjs_kesehatan[0]['nominal'], 0, ',', '.')) }}" readonly>
-                @error('bpjs_kesehatan')
-                <div class="invalid-feedback">
-                    {{ $message }}
+@if(!empty($data_bpjs_kesehatan) || !empty($data_bpjs_ketenagakerjaan) || !empty($data_bpjs_ketenagakerjaan_jkk))
+    @if(!empty($data_bpjs_kesehatan))
+        <div class="form-row">
+            <div class="col mb-4">
+                <div class="card p-4">
+                    <label for="potongan_bpjs_kesehatan">{{ $data_bpjs_kesehatan[0]['name'] }}</label>
+                    <input type="text" class="form-control money @error('bpjs_kesehatan') is-invalid @enderror"
+                           id="potongan_bpjs_kesehatan" name="potongan_bpjs_kesehatan"
+                           value="{{ old('bpjs_kesehatan', number_format($data_bpjs_kesehatan[0]['nominal'], 0, ',', '.')) }}" readonly>
+                    @error('bpjs_kesehatan')
+                    <div class="invalid-feedback">
+                        {{ $message }}
+                    </div>
+                    @enderror
                 </div>
-                @enderror
             </div>
         </div>
-    </div>
+    @endif
     @if(!empty($data_bpjs_ketenagakerjaan))
         @foreach($data_bpjs_ketenagakerjaan->chunk(2) as $chunk)
             <div class="form-row">
@@ -99,4 +101,10 @@
             @endif
         </div>
     @endif
+@else
+    <div class="form-row">
+        <div class="col mb-4 text-center">
+            <h4>Tidak Ada Pengurangan BPJS Kesehatan & Ketenagakerjaan</h4>
+        </div>
+    </div>
 @endif
