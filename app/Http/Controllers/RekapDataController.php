@@ -121,14 +121,14 @@ class RekapDataController extends Controller
         $jumlah_mangkir = $user->MappingShift->whereBetween('tanggal', [$mulai, $akhir])->where('status_absen', 'Tidak Masuk')->count();
         $gajiPokok = $dataKaryawan['upah'];
 
-        if ($dataKaryawan['bpjsKetenagakerjaan'] !== null) {
+        if (!empty($dataKaryawan['bpjsKetenagakerjaan'])) {
             $dataKaryawan['bpjsKetenagakerjaan'] = $this->prosesPotonganJaminan(
                 $dataKaryawan['bpjsKetenagakerjaan'],
                 $gajiPokok[0]['gaji_pokok']
             );
         }
 
-        if($dataKaryawan['bpjsKetenagakerjaanJkk'] !== null) {
+        if(!empty($dataKaryawan['bpjsKetenagakerjaanJkk'])) {
             $dataKaryawan['bpjsKetenagakerjaanJkk'] = $this->prosesPotonganJaminan(
                 $dataKaryawan['bpjsKetenagakerjaanJkk'],
                 $gajiPokok[0]['gaji_pokok']
