@@ -27,7 +27,7 @@ class PayrollController extends Controller
 
         $query = Payroll::query();
 
-        if (auth()->user()->is_admin === 'admin') {
+        if (auth()->user()->is_admin !== 'admin') {
 //            $data = Payroll::when($bulan, function ($query) use ($bulan) {
 //                                return $query->where('bulan', $bulan);
 //                            })
@@ -272,20 +272,49 @@ class PayrollController extends Controller
         return $pdf->stream();
     }
 
-    private function modifyPayrollData($collectionLengkap, $collectionPayroll) {
+//    private function modifyPayrollData($collectionLengkap, $collectionPayroll) {
+//        // Pastikan tipe-nya Collection
+//        $collectionLengkap = collect($collectionLengkap);
+//        $collectionPayroll = collect($collectionPayroll);
+//
+//        return $collectionLengkap->map(function ($item) use ($collectionPayroll) {
+//            // 1. Ambil nama asli dari item collection (misal: "Jaminan Hari Tua")
+//            $namaAsli = $item->name;
+//            // 2. Buat 'kunci dinamis' yang cocok dengan format array potongan
+//            //    ("Jaminan Hari Tua" -> "potongan_Jaminan_Hari_Tua")
+//            $kunciDinamis = 'potongan_' . str_replace(' ', '_', $namaAsli);
+//            // 3. Cek apakah kunci ini ada di data potongan.
+//            //    Jika ada, ambil nilainya. Jika tidak, beri nilai default 0.
+//            $nilaiPotongan = $collectionPayroll[$kunciDinamis] ?? 0;
+//            // 4. Tambahkan nilai potongan sebagai properti BARU ke dalam item
+//            $item->nilai_potongan = $nilaiPotongan;
+//            // 5. Kembalikan item yang sudah diperkaya
+//            return $item;
+//        });
+//    }
+
+    private function modifyPayrollData($collectionLengkap, $collectionPayroll)
+    {
+        // Pastikan tipe-nya Collection
+        $collectionLengkap = collect($collectionLengkap);
+        $collectionPayroll = collect($collectionPayroll);
+
         return $collectionLengkap->map(function ($item) use ($collectionPayroll) {
-            // 1. Ambil nama asli dari item collection (misal: "Jaminan Hari Tua")
-            $namaAsli = $item->name;
-            // 2. Buat 'kunci dinamis' yang cocok dengan format array potongan
-            //    ("Jaminan Hari Tua" -> "potongan_Jaminan_Hari_Tua")
+            // Aman untuk array maupun object
+            $namaAsli = $item->name ?? $item['name'] ?? null;
+
             $kunciDinamis = 'potongan_' . str_replace(' ', '_', $namaAsli);
-            // 3. Cek apakah kunci ini ada di data potongan.
-            //    Jika ada, ambil nilainya. Jika tidak, beri nilai default 0.
             $nilaiPotongan = $collectionPayroll[$kunciDinamis] ?? 0;
-            // 4. Tambahkan nilai potongan sebagai properti BARU ke dalam item
-            $item->nilai_potongan = $nilaiPotongan;
-            // 5. Kembalikan item yang sudah diperkaya
+
+            // Tambahkan properti baru
+            if (is_array($item)) {
+                $item['nilai_potongan'] = $nilaiPotongan;
+            } else {
+                $item->nilai_potongan = $nilaiPotongan;
+            }
+
             return $item;
         });
     }
+
 }
