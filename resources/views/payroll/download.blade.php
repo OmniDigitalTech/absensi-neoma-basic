@@ -169,6 +169,7 @@
 
         <table style="font-size: 13px">
             <tbody>
+                @if($data_payroll->gaji_pokok > 0)
                 <tr>
                     <td style="padding-left: 10px; padding-right: 10px">Gaji Pokok</td>
                     <td style="padding-left: 10px; padding-right: 10px">:</td>
@@ -176,14 +177,28 @@
                     <td style="padding-left: 10px; padding-right: 10px"></td>
                     <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data_payroll->gaji_pokok) }}</td>
                 </tr>
+                @endif
+                @if($data_payroll->uang_makan > 0)
                 <tr>
-                    <td style="padding-left: 10px; padding-right: 10px">Uang Makan & Transport</td>
+                    <td style="padding-left: 10px; padding-right: 10px">Uang Makan</td>
+                    <td style="padding-left: 10px; padding-right: 10px">:</td>
+                    <td style="padding-left: 10px; padding-right: 10px"></td>
+                    <td style="padding-left: 10px; padding-right: 10px"></td>
+                    <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data_payroll->uang_makan) }}
+                    </td>
+                </tr>
+                @endif
+                @if($data_payroll->uang_transport > 0)
+                <tr>
+                    <td style="padding-left: 10px; padding-right: 10px">Uang Transport</td>
                     <td style="padding-left: 10px; padding-right: 10px">:</td>
                     <td style="padding-left: 10px; padding-right: 10px"></td>
                     <td style="padding-left: 10px; padding-right: 10px"></td>
                     <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data_payroll->uang_transport) }}
                     </td>
                 </tr>
+                @endif
+                @if($data_payroll->total_kehadiran > 0)
                 <tr>
                     <td style="padding-left: 10px; padding-right: 10px">Kehadiran 100%</td>
                     <td style="padding-left: 10px; padding-right: 10px">:</td>
@@ -192,6 +207,8 @@
                     <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data_payroll->total_kehadiran) }}
                     </td>
                 </tr>
+                @endif
+                @if($data_payroll->total_lembur > 0)
                 <tr>
                     <td style="padding-left: 10px; padding-right: 10px">Lembur</td>
                     <td style="padding-left: 10px; padding-right: 10px">:</td>
@@ -199,6 +216,8 @@
                     <td style="padding-left: 10px; padding-right: 10px">Jam</td>
                     <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data_payroll->total_lembur) }}</td>
                 </tr>
+                @endif
+                @if($data_payroll->total_oncal > 0)
                 <tr>
                     <td style="padding-left: 10px; padding-right: 10px">On Call</td>
                     <td style="padding-left: 10px; padding-right: 10px">:</td>
@@ -206,13 +225,17 @@
                     <td style="padding-left: 10px; padding-right: 10px">Jam</td>
                     <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data_payroll->total_oncall) }}</td>
                 </tr>
+                @endif
+                @if($data_payroll->total_bonus > 0)
                 <tr>
-                    <td style="padding-left: 10px; padding-right: 10px">Insentif</td>
+                    <td style="padding-left: 10px; padding-right: 10px">Bonus</td>
                     <td style="padding-left: 10px; padding-right: 10px">:</td>
                     <td style="padding-left: 10px; padding-right: 10px"></td>
                     <td style="padding-left: 10px; padding-right: 10px"></td>
                     <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data_payroll->total_bonus) }}</td>
                 </tr>
+                @endif
+                @if($data_payroll->total_thr > 0)
                 <tr>
                     <td style="padding-left: 10px; padding-right: 10px">Tunjangan Hari Raya</td>
                     <td style="padding-left: 10px; padding-right: 10px">:</td>
@@ -220,6 +243,7 @@
                     <td style="padding-left: 10px; padding-right: 10px"></td>
                     <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data_payroll->total_thr) }}</td>
                 </tr>
+                @endif
                 <tr>
                     <td style="padding-left: 10px; padding-right: 10px"></td>
                     <td style="padding-left: 10px; padding-right: 10px"></td>
@@ -244,6 +268,7 @@
 
         <table style="font-size: 13px">
             <tbody>
+                @if($data_payroll->total_terlambat > 0)
                 <tr>
                     <td style="padding-left: 10px; padding-right: 17px">Keterlambatan</td>
                     <td style="padding-left: 10px; padding-right: 10px">:</td>
@@ -252,6 +277,8 @@
                     <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data_payroll->total_terlambat) }}
                     </td>
                 </tr>
+                @endif
+                @if($data_payroll->total_mangkir > 0)
                 <tr>
                     <td style="padding-left: 10px; padding-right: 17px">Mangkir</td>
                     <td style="padding-left: 10px; padding-right: 10px">:</td>
@@ -260,6 +287,8 @@
                     <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data_payroll->total_mangkir) }}
                     </td>
                 </tr>
+                @endif
+                @if($data_payroll->total_izin > 0)
                 <tr>
                     <td style="padding-left: 10px; padding-right: 17px">Izin</td>
                     <td style="padding-left: 10px; padding-right: 10px">:</td>
@@ -267,7 +296,7 @@
                     <td style="padding-left: 10px; padding-right: 10px">Hari</td>
                     <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data_payroll->total_izin) }}</td>
                 </tr>
-                <br>
+                @endif
 {{--                <tr>--}}
 {{--                    <td style="padding-left: 10px; padding-right: 17px">Kasbon</td>--}}
 {{--                    <td style="padding-left: 10px; padding-right: 10px">:</td>--}}
@@ -282,37 +311,84 @@
 {{--                    <td style="padding-left: 10px; padding-right: 10px"></td>--}}
 {{--                    <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data_payroll->loss) }}</td>--}}
 {{--                </tr>--}}
-                @if(!empty($data_bpjs_ketenagakerjaan))
+
+{{--                @if(!empty($data_bpjs_ketenagakerjaan))--}}
+{{--                    <tr>--}}
+{{--                        <td style="padding-left: 10px; padding-right: 17px">BPJS Kesehatan</td>--}}
+{{--                        <td style="padding-left: 10px; padding-right: 10px">:</td>--}}
+{{--                        <td style="padding-left: 10px; padding-right: 10px">{{ $data_bpjs_kesehatan[0]['kelas'] }}</td>--}}
+{{--                        <td style="padding-left: 10px; padding-right: 10px">Kelas</td>--}}
+{{--                        <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data_payroll->potongan_bpjs_kesehatan) }}</td>--}}
+{{--                    </tr>--}}
+{{--                @endif--}}
+{{--                @if(!empty($data_bpjs_ketenagakerjaan))--}}
+{{--                    @foreach($data_bpjs_ketenagakerjaan as $bpjs_ketenagakerjaan)--}}
+{{--                        <tr>--}}
+{{--                            <td style="padding-left: 10px; padding-right: 17px">{{ $bpjs_ketenagakerjaan->name }}</td>--}}
+{{--                            <td style="padding-left: 10px; padding-right: 10px">:</td>--}}
+{{--                            <td style="padding-left: 10px; padding-right: 10px">{{ $bpjs_ketenagakerjaan->nominal }}</td>--}}
+{{--                            <td style="padding-left: 10px; padding-right: 10px">%</td>--}}
+{{--                            <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($bpjs_ketenagakerjaan->nilai_potongan) }}</td>--}}
+{{--                        </tr>--}}
+{{--                    @endforeach--}}
+{{--                    @if(!empty($data_bpjs_ketenagakerjaan_jkk))--}}
+{{--                        @foreach($data_bpjs_ketenagakerjaan_jkk as $bpjs_ketenagakerjaan_jkk)--}}
+{{--                            <tr>--}}
+{{--                                <td style="padding-left: 10px; padding-right: 17px">Jaminan Kecelakaan<br>Kerja - {{ $bpjs_ketenagakerjaan_jkk->name }}</td>--}}
+{{--                                <td style="padding-left: 10px; padding-right: 10px">:</td>--}}
+{{--                                <td style="padding-left: 10px; padding-right: 10px">{{ $bpjs_ketenagakerjaan_jkk->nominal }}</td>--}}
+{{--                                <td style="padding-left: 10px; padding-right: 10px">%</td>--}}
+{{--                                <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data_payroll->potongan_Jaminan_Kecelakaan_Kerja) }}</td>--}}
+{{--                            </tr>--}}
+{{--                        @endforeach--}}
+{{--                    @endif--}}
+{{--                @endif--}}
+
+                 🩺 BPJS KESEHATAN
+                @if(!empty($data_bpjs_kesehatan))
                     <tr>
                         <td style="padding-left: 10px; padding-right: 17px">BPJS Kesehatan</td>
                         <td style="padding-left: 10px; padding-right: 10px">:</td>
-                        <td style="padding-left: 10px; padding-right: 10px">{{ $data_bpjs_kesehatan[0]['kelas'] }}</td>
+                        <td style="padding-left: 10px; padding-right: 10px">
+                            {{ $data_bpjs_kesehatan[0]['kelas'] ?? '-' }}
+                        </td>
                         <td style="padding-left: 10px; padding-right: 10px">Kelas</td>
-                        <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data_payroll->potongan_bpjs_kesehatan) }}</td>
+                        <td style="padding-left: 10px; padding-right: 10px">
+                            Rp {{ number_format($data_payroll->potongan_bpjs_kesehatan ?? 0) }}
+                        </td>
                     </tr>
                 @endif
+
+                 ⚙️ BPJS KETENAGAKERJAAN
                 @if(!empty($data_bpjs_ketenagakerjaan))
                     @foreach($data_bpjs_ketenagakerjaan as $bpjs_ketenagakerjaan)
                         <tr>
-                            <td style="padding-left: 10px; padding-right: 17px">{{ $bpjs_ketenagakerjaan->name }}</td>
+                            <td style="padding-left: 10px; padding-right: 17px">{{ $bpjs_ketenagakerjaan->name ?? '-' }}</td>
                             <td style="padding-left: 10px; padding-right: 10px">:</td>
-                            <td style="padding-left: 10px; padding-right: 10px">{{ $bpjs_ketenagakerjaan->nominal }}</td>
+                            <td style="padding-left: 10px; padding-right: 10px">{{ $bpjs_ketenagakerjaan->nominal ?? 0 }}</td>
                             <td style="padding-left: 10px; padding-right: 10px">%</td>
-                            <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($bpjs_ketenagakerjaan->nilai_potongan) }}</td>
+                            <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($bpjs_ketenagakerjaan->nilai_potongan ?? 0) }}</td>
                         </tr>
                     @endforeach
-                    @if(!empty($data_bpjs_ketenagakerjaan_jkk))
-                        @foreach($data_bpjs_ketenagakerjaan_jkk as $bpjs_ketenagakerjaan_jkk)
-                            <tr>
-                                <td style="padding-left: 10px; padding-right: 17px">Jaminan Kecelakaan<br>Kerja - {{ $bpjs_ketenagakerjaan_jkk->name }}</td>
-                                <td style="padding-left: 10px; padding-right: 10px">:</td>
-                                <td style="padding-left: 10px; padding-right: 10px">{{ $bpjs_ketenagakerjaan_jkk->nominal }}</td>
-                                <td style="padding-left: 10px; padding-right: 10px">%</td>
-                                <td style="padding-left: 10px; padding-right: 10px">Rp {{ number_format($data_payroll->potongan_Jaminan_Kecelakaan_Kerja) }}</td>
-                            </tr>
-                        @endforeach
-                    @endif
                 @endif
+
+                 🛡️ BPJS KETENAGAKERJAAN JKK
+                @if(!empty($data_bpjs_ketenagakerjaan_jkk))
+                    @foreach($data_bpjs_ketenagakerjaan_jkk as $bpjs_ketenagakerjaan_jkk)
+                        <tr>
+                            <td style="padding-left: 10px; padding-right: 17px">
+                                Jaminan Kecelakaan<br>Kerja - {{ $bpjs_ketenagakerjaan_jkk->name ?? '-' }}
+                            </td>
+                            <td style="padding-left: 10px; padding-right: 10px">:</td>
+                            <td style="padding-left: 10px; padding-right: 10px">{{ $bpjs_ketenagakerjaan_jkk->nominal ?? 0 }}</td>
+                            <td style="padding-left: 10px; padding-right: 10px">%</td>
+                            <td style="padding-left: 10px; padding-right: 10px">
+                                Rp {{ number_format($data_payroll->potongan_Jaminan_Kecelakaan_Kerja ?? 0) }}
+                            </td>
+                        </tr>
+                    @endforeach
+                @endif
+
                 <tr>
                     <td style="padding-left: 10px; padding-right: 17px"></td>
                     <td style="padding-left: 10px; padding-right: 10px"></td>
