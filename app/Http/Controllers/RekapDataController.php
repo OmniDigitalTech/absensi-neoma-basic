@@ -61,7 +61,7 @@ class RekapDataController extends Controller
         return (new RekapExport($_GET))->download('List Rekap Data.xlsx');
     }
 
-    private function prosesPotonganJaminan($collection, $gajiPokok): \Illuminate\Support\Collection
+    private function prosesPotonganJaminan($collection, $gajiPokok)
     {
         // Pengaman: jika datanya bukan collection atau kosong, langsung kembalikan apa adanya.
         if (!$collection instanceof \Illuminate\Support\Collection || $collection->isEmpty()) {
