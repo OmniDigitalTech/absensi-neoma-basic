@@ -160,9 +160,12 @@ class PayrollController extends Controller
 
     public function edit($id)
     {
+        $dataPayroll = Payroll::query()->find($id);
+        $dataUser = User::query()->find($dataPayroll->user_id);
         return view('payroll.edit', [
             'title' => 'Edit Data Penggajian',
-            'data' => Payroll::find($id)
+            'data' => $dataPayroll,
+            'user' => $dataUser
         ]);
     }
     public function update(Request $request, $id)
@@ -253,7 +256,9 @@ class PayrollController extends Controller
 
         $dataKaryawan = $this->karyawanService->getCutiIzinUpahDeduksiKaryawan($user->golongan_id, $user->tipe_karyawan);
         $dataPayroll = Payroll::query()->find($id);
-        $modifiedBpjsKetenagakerjaan = $this->modifyPayrollData($dataKaryawan['bpjsKetenagakerjaan'], collect($dataPayroll));
+        if($dataKaryawan['bpjsKetenagakerjaan']) {
+           $modifiedBpjsKetenagakerjaan = $this->modifyPayrollData($dataKaryawan['bpjsKetenagakerjaan'], collect($dataPayroll));
+        }
 //        $modifiedBpjsKetenagakerjaanJkk = $this->modifyPayrollData($dataKaryawan['bpjsKetenagakerjaanJkk'], collect($dataPayroll));
 
         $dataCutiIzin = DataCuti::query()->get();
@@ -264,7 +269,7 @@ class PayrollController extends Controller
             'title' => 'Penggajian',
             'data_payroll' => $dataPayroll,
             'data_bpjs_kesehatan' => $dataKaryawan['bpjsKesehatan'],
-            'data_bpjs_ketenagakerjaan' => $modifiedBpjsKetenagakerjaan,
+            'data_bpjs_ketenagakerjaan' => $modifiedBpjsKetenagakerjaan ?? $dataKaryawan['bpjsKetenagakerjaan'],
             'data_bpjs_ketenagakerjaan_jkk' => $dataKaryawan['bpjsKetenagakerjaanJkk'],
             'sisa_cuti' => $sisa_cuti,
         ]);

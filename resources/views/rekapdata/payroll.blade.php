@@ -86,7 +86,7 @@
                             <select name="bulan" id="bulan" class="form-control @error('bulan') is-invalid @enderror selectpicker" data-live-search="true">
                                 <option value="">Pilih Bulan</option>
                                 @foreach ($bulan as $bu)
-                                    @if(old('bulan', $bulan_filter) == $bu['id'])
+                                    @if(old('bulan', $bulan_filter) === $bu['id'])
                                         <option value="{{ $bu['id'] }}" selected>{{ $bu['bulan'] }}</option>
                                     @else
                                         <option value="{{ $bu['id'] }}">{{ $bu['bulan'] }}</option>
@@ -110,7 +110,7 @@
                             <select name="tahun" id="tahun" class="form-control @error('tahun') is-invalid @enderror selectpicker" data-live-search="true">
                                 <option value="">Pilih Tahun</option>
                                 @for ($i = $now; $i >= $last; $i--)
-                                    @if(old('tahun', $tahun_filter) == $i)
+                                    @if(old('tahun', $tahun_filter) === $i)
                                         <option value="{{ $i }}" selected>{{ $i }}</option>
                                     @else
                                         <option value="{{ $i }}">{{ $i }}</option>
@@ -179,6 +179,8 @@
                                 @enderror
                             </div>
                         </div>
+                    </div>
+                    <div class="form-row">
                         <div class="col mb-4">
                             <div class="card p-4">
                                 <label for="jumlah_kehadiran">100% Kehadiran</label>
