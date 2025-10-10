@@ -53,13 +53,13 @@ class SettingsController extends Controller
             'bpjs_ketenagakerjaan_jkm'
         ];
 
-//        foreach ($fields as $field) {
-//            if (array_key_exists($field, $validated)) {
-//                $validated[$field] = $request->input($field);
-//            } else {
-//                $validated[$field] = null;
-//            }
-//        }
+        foreach ($fields as $field) {
+            if (array_key_exists($field, $validated)) {
+                $validated[$field] = $request->input($field);
+            } else {
+                $validated[$field] = null;
+            }
+        }
 
         if ($request->bpjs_ketenagakerjaan === 'ya' &&
             $request->bpjs_ketenagakerjaan_jht === null &&
