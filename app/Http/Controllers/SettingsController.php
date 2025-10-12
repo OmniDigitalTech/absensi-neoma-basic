@@ -65,7 +65,8 @@ class SettingsController extends Controller
             $request->bpjs_ketenagakerjaan_jht === null &&
             $request->bpjs_ketenagakerjaan_jp === null &&
             $request->bpjs_ketenagakerjaan_jkp === null &&
-            $request->bpjs_ketenagakerjaan_jkm === null)
+            $request->bpjs_ketenagakerjaan_jkm === null &&
+            $request->bpjs_ketenagakerjaan_jkk === null)
         {
             $validated['bpjs_ketenagakerjaan'] = 'tidak';
         }

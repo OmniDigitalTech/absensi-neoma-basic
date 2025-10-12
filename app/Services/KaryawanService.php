@@ -13,22 +13,24 @@ use App\Models\Upah;
 
 class KaryawanService
 {
-    public function getCutiIzinUpahDeduksiKaryawan ($golonganId, $tipeKaryawan) {
+    public function getCutiIzinUpahDeduksiKaryawan ($golonganId, $tipeKaryawan): array
+    {
         $settings = settings::query()->first();
         $cutiIzin = [];
         $upah = [];
 //        $dynamicUpah = [];
         $deduksi = [];
         $bpjsKesehatan = [];
-        $bpjsKetenagakerjaan = [];
-        $bpjsKetenagakerjaanJkk = [];
-        $dataIdBpjsKetenagakerjaan = [];
-        $fieldsbpjsKetenagakerjaan = [
-            'bpjs_ketenagakerjaan_jht',
-            'bpjs_ketenagakerjaan_jp',
-            'bpjs_ketenagakerjaan_jkp',
-            'bpjs_ketenagakerjaan_jkm'
-        ];
+        $getBpjsKetenagakerjaan = [];
+//        $bpjsKetenagakerjaan = [];
+//        $bpjsKetenagakerjaanJkk = [];
+//        $dataIdBpjsKetenagakerjaan = [];
+//        $fieldsBpjsKetenagakerjaan = [
+//            'bpjs_ketenagakerjaan_jht',
+//            'bpjs_ketenagakerjaan_jp',
+//            'bpjs_ketenagakerjaan_jkp',
+//            'bpjs_ketenagakerjaan_jkm'
+//        ];
 
 
         if ($golonganId) {
@@ -55,17 +57,18 @@ class KaryawanService
                     }
                 }
 
-                if ($settings->bpjs_ketenagakerjaan === 'ya') {
-                    foreach ($fieldsbpjsKetenagakerjaan as $field) {
-                        if ($settings->$field !== null) {
-                            $dataIdBpjsKetenagakerjaan[] = $settings->$field;
-                        }
-                    }
-                    if (!empty($dataIdBpjsKetenagakerjaan)) {
-                        $bpjsKetenagakerjaan = Ketenagakerjaan::query()->whereIn('id', $dataIdBpjsKetenagakerjaan)->get();
-                    }
-                    $bpjsKetenagakerjaanJkk = KetenagakerjaanJkk::query()->where('id', $settings->bpjs_ketenagakerjaan_jkk)->get();
-                }
+                $getBpjsKetenagakerjaan = $this->getActiveSettingBpjsKetenagakerjaan();
+//                if ($settings->bpjs_ketenagakerjaan === 'ya') {
+//                    foreach ($fieldsBpjsKetenagakerjaan as $field) {
+//                        if ($settings->$field !== null) {
+//                            $dataIdBpjsKetenagakerjaan[] = $settings->$field;
+//                        }
+//                    }
+//                    if (!empty($dataIdBpjsKetenagakerjaan)) {
+//                        $bpjsKetenagakerjaan = Ketenagakerjaan::query()->whereIn('id', $dataIdBpjsKetenagakerjaan)->get();
+//                    }
+//                    $bpjsKetenagakerjaanJkk = KetenagakerjaanJkk::query()->where('id', $settings->bpjs_ketenagakerjaan_jkk)->get();
+//                }
             }
         }
 
@@ -75,8 +78,8 @@ class KaryawanService
 //            'dynamicUpah' => $dynamicUpah,
             'deduksi' => $deduksi,
             'bpjsKesehatan' => $bpjsKesehatan,
-            'bpjsKetenagakerjaan' => $bpjsKetenagakerjaan,
-            'bpjsKetenagakerjaanJkk' => $bpjsKetenagakerjaanJkk
+            'bpjsKetenagakerjaan' => $getBpjsKetenagakerjaan['bpjsKetenagakerjaan'],
+            'bpjsKetenagakerjaanJkk' => $getBpjsKetenagakerjaan['bpjsKetenagakerjaanJkk']
         ];
     }
 
@@ -91,5 +94,101 @@ class KaryawanService
 
             return $item;
         });
+    }
+
+    public function getBpjsEditPayroll($dataPayroll): array
+    {
+//        $settings = settings::query()->first();
+        $bpjsKesehatan = [];
+        $bpjsKetenagakerjaan = [];
+        $bpjsKetenagakerjaanDenganPotongan = [];
+        $bpjsKetenagakerjaanJkk = [];
+        $bpjsKetenagakerjaanJkkDenganPotongan = [];
+        $fieldsIdBpjsKetenagakerjaan = [
+            'id_Jaminan_Hari_Tua',
+            'id_Jaminan_Pensiun',
+            'id_Jaminan_Kematian',
+            'id_Jaminan_Kehilangan_Pekerjaan'
+        ];
+
+        if ($dataPayroll) {
+            if ($dataPayroll->potongan_bpjs_kesehatan !== 0) {
+                $gajiPokok = $dataPayroll->gaji_pokok;
+                if ($gajiPokok > 4000000) {
+                    $bpjsKesehatanRaw = Kesehatan::query()->where('id', 1)->get();
+
+                    $bpjsKesehatan = $this->modifyCollectionData($bpjsKesehatanRaw);
+                } else {
+                    $bpjsKesehatanRaw = Kesehatan::query()->where('id', 2)->get();
+
+                    $bpjsKesehatan = $this->modifyCollectionData($bpjsKesehatanRaw);
+                }
+            }
+
+            foreach ($fieldsIdBpjsKetenagakerjaan as $field) {
+                if ($dataPayroll->$field !== 0) {
+                    $dataIdBpjsKetenagakerjaan[] = $dataPayroll->$field;
+                }
+            }
+            if (!empty($dataIdBpjsKetenagakerjaan)) {
+                $bpjsKetenagakerjaan = Ketenagakerjaan::query()->whereIn('id', $dataIdBpjsKetenagakerjaan)->get();
+
+                $bpjsKetenagakerjaanDenganPotongan = $bpjsKetenagakerjaan->map(function ($item) use ($dataPayroll) {
+                    $namaKomponen = $item->name;
+                    $kunciPotongan = 'potongan_' . str_replace(' ', '_', $namaKomponen);
+                    $nilaiPotongan = $dataPayroll->$kunciPotongan ?? 0;
+                    $item->nilai_potongan = $nilaiPotongan;
+                    return $item;
+                });
+            }
+            if ($dataPayroll->id_Jaminan_Kecelakaan_Kerja !== 0) {
+               $bpjsKetenagakerjaanJkk = KetenagakerjaanJkk::query()->where('id', $dataPayroll->id_Jaminan_Kecelakaan_Kerja)->get();
+
+                $bpjsKetenagakerjaanJkkDenganPotongan = $bpjsKetenagakerjaanJkk->map(function ($item) use ($dataPayroll) {
+                    $nilaiPotongan = $dataPayroll->potongan_Jaminan_Kecelakaan_Kerja ?? 0;
+                    $item->nilai_potongan = $nilaiPotongan;
+                    return $item;
+                });
+            }
+        }
+
+        return [
+            'bpjsKesehatan' => $bpjsKesehatan,
+            'bpjsKetenagakerjaan' => $bpjsKetenagakerjaanDenganPotongan,
+            'bpjsKetenagakerjaanJkk' => $bpjsKetenagakerjaanJkkDenganPotongan
+        ];
+    }
+
+    public function getActiveSettingBpjsKetenagakerjaan(): array
+    {
+        $settings = settings::query()->first();
+        $bpjsKetenagakerjaan = [];
+        $bpjsKetenagakerjaanJkk = [];
+        $dataIdBpjsKetenagakerjaan = [];
+        $fieldsBpjsKetenagakerjaan = [
+            'bpjs_ketenagakerjaan_jht',
+            'bpjs_ketenagakerjaan_jp',
+            'bpjs_ketenagakerjaan_jkp',
+            'bpjs_ketenagakerjaan_jkm'
+        ];
+
+        if ($settings->bpjs_ketenagakerjaan === 'ya') {
+            foreach ($fieldsBpjsKetenagakerjaan as $field) {
+                if ($settings->$field !== null) {
+                    $dataIdBpjsKetenagakerjaan[] = $settings->$field;
+                }
+            }
+            if (!empty($dataIdBpjsKetenagakerjaan)) {
+                $bpjsKetenagakerjaan = Ketenagakerjaan::query()->whereIn('id', $dataIdBpjsKetenagakerjaan)->get();
+            }
+            if ($settings->bpjs_ketenagakerjaan_jkk) {
+               $bpjsKetenagakerjaanJkk = KetenagakerjaanJkk::query()->where('id', $settings->bpjs_ketenagakerjaan_jkk)->get();
+            }
+        }
+
+        return [
+            'bpjsKetenagakerjaan' => $bpjsKetenagakerjaan,
+            'bpjsKetenagakerjaanJkk' => $bpjsKetenagakerjaanJkk
+        ];
     }
 }
