@@ -469,18 +469,18 @@
                     <div class="form-row">
                         <div class="col mb-4">
                             <div class="card p-4">
-                                <center>
+                                <div style="text-align: center;">
                                     <label style="color:green">TOTAL PENJUMLAHAN</label>
                                     <input type="text" class="form-control border-white text-center money @error('total_penjumlahan') is-invalid @enderror" id="total_penjumlahan" name="total_penjumlahan" value="{{ old('total_penjumlahan') }}" readonly style="background-color: white; color:black">
-                                </center>
+                                </div>
                             </div>
                         </div>
                         <div class="col mb-4">
                             <div class="card p-4">
-                                <center>
+                                <div style="text-align: center;">
                                     <label style="color:red">TOTAL PENGURANGAN</label>
                                     <input type="text" class="form-control border-white text-center money @error('total_pengurangan') is-invalid @enderror" id="total_pengurangan" name="total_pengurangan" value="{{ old('total_pengurangan') }}" readonly style="background-color: white; color:black">
-                                </center>
+                                </div>
                             </div>
                         </div>
                     </div>

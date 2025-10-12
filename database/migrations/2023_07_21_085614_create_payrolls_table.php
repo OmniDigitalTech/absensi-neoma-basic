@@ -42,10 +42,15 @@ class CreatePayrollsTable extends Migration
             $table->integer('uang_mangkir');
             $table->integer('total_mangkir');
             $table->integer('potongan_bpjs_kesehatan')->nullable();
+            $table->integer('id_Jaminan_Hari_Tua')->nullable();
             $table->integer('potongan_Jaminan_Hari_Tua')->nullable();
+            $table->integer('id_Jaminan_Pensiun')->nullable();
             $table->integer('potongan_Jaminan_Pensiun')->nullable();
+            $table->integer('id_Jaminan_Kematian')->nullable();
             $table->integer('potongan_Jaminan_Kematian')->nullable();
+            $table->integer('id_Jaminan_Kehilangan_Pekerjaan')->nullable();
             $table->integer('potongan_Jaminan_Kehilangan_Pekerjaan')->nullable();
+            $table->integer('id_Jaminan_Kecelakaan_Kerja')->nullable();
             $table->integer('potongan_Jaminan_Kecelakaan_Kerja')->nullable();
             $table->integer('uang_makan');
             $table->integer('uang_transport');

@@ -161,11 +161,17 @@ class PayrollController extends Controller
     public function edit($id)
     {
         $dataPayroll = Payroll::query()->find($id);
+
         $dataUser = User::query()->find($dataPayroll->user_id);
+        $dataBpjsEditPayroll = $this->karyawanService->getBpjsEditPayroll($dataPayroll);
+
         return view('payroll.edit', [
             'title' => 'Edit Data Penggajian',
+            'user' => $dataUser,
             'data' => $dataPayroll,
-            'user' => $dataUser
+            'data_bpjs_kesehatan' => $dataBpjsEditPayroll['bpjsKesehatan'],
+            'data_bpjs_ketenagakerjaan' => $dataBpjsEditPayroll['bpjsKetenagakerjaan'],
+            'data_bpjs_ketenagakerjaan_jkk' => $dataBpjsEditPayroll['bpjsKetenagakerjaanJkk']
         ]);
     }
     public function update(Request $request, $id)

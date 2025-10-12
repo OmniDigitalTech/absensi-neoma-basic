@@ -148,30 +148,6 @@
                                         </label>
                                     </div>
                                 @endforeach
-{{--                                <div class="form-check">--}}
-{{--                                    <input class="form-check-input" type="radio" name="jenisJkkCheckbox" id="tingkatResiko1" value="0.870">--}}
-{{--                                    <label class="form-check-label" for="tingkatResiko1">--}}
-{{--                                        Sangat Tinggi (0.870%)--}}
-{{--                                    </label>--}}
-{{--                                </div>--}}
-{{--                                <div class="form-check">--}}
-{{--                                    <input class="form-check-input" type="radio" name="jenisJkkCheckbox" id="tingkatResiko2" value="0.635">--}}
-{{--                                    <label class="form-check-label" for="tingkatResiko2">--}}
-{{--                                        Tinggi (0.635%)--}}
-{{--                                    </label>--}}
-{{--                                </div>--}}
-{{--                                <div class="form-check">--}}
-{{--                                    <input class="form-check-input" type="radio" name="jenisJkkCheckbox" id="tingkatResiko3" value="0.445">--}}
-{{--                                    <label class="form-check-label" for="tingkatResiko3">--}}
-{{--                                        Sedang (0.445%)--}}
-{{--                                    </label>--}}
-{{--                                </div>--}}
-{{--                                <div class="form-check">--}}
-{{--                                    <input class="form-check-input" type="radio" name="jenisJkkCheckbox" id="tingkatResiko4" value="0.270">--}}
-{{--                                    <label class="form-check-label" for="tingkatResiko4">--}}
-{{--                                        Rendah (0.270%)--}}
-{{--                                    </label>--}}
-{{--                                </div>--}}
                             </div>
                         </div>
                     </div>
@@ -231,8 +207,8 @@
             noRadioButtonKetenagakerjaan.addEventListener('change', function() {
                 if (noRadioButtonKetenagakerjaan.checked) {
                     jenisBpjsKetenagakerjaan.style.display = 'none';
-                    jenisJkk.style.display = 'none';
                     jkkCheckbox.checked = false;
+                    jenisJkk.style.display = 'none';
 
                     // Uncheck all checkboxes inside jenisBpjsKetenagakerjaan
                     const checkboxes = jenisBpjsKetenagakerjaan.querySelectorAll('input[type="checkbox"]');
@@ -253,6 +229,10 @@
                     jenisJkk.style.display = 'block';
                 } else {
                     jenisJkk.style.display = 'none';
+                    const radioButtons = jenisJkk.querySelectorAll('input[type="radio"]');
+                    radioButtons.forEach(radio => {
+                        radio.checked = false;
+                    });
                 }
             });
 
