@@ -20,8 +20,10 @@
                                     <span> Rp. </span>
                                 </div>
                             </div>
-                            <input type="text" class="form-control @error($namaUmum) is-invalid @enderror" name="{{ $namaUmum }}" id="{{ $namaUmum }}"
-                                   value="@if(fmod($deduksi->nominal, 1) == 0){{ number_format($deduksi->nominal, 0, ',', '.') }}@else{{ number_format($deduksi->nominal, 2, ',', '.') }}@endif" disabled>
+                            <input type="text" class="form-control @error($namaUmum) is-invalid @enderror"
+                                   name="{{ $namaUmum }}" id="{{ $namaUmum }}"
+                                   value="@if(fmod($deduksi->nominal, 1) == 0){{ number_format($deduksi->nominal, 0, ',', '.') }}@else{{ number_format($deduksi->nominal, 2, ',', '.') }}@endif"
+                                   disabled>
                             <div class="input-group-append">
                                 <div class="input-group-text">
                                     <span> / {{ $deduksi->keterangan }}</span>
@@ -48,7 +50,7 @@
         <h5 style="color: blue">BPJS Kesehatan</h5>
     </div>
     <div class="form-row">
-        @if($data_bpjs_kesehatan->isNotEmpty())
+        @if($data_bpjs_kesehatan !== null)
             @foreach($data_bpjs_kesehatan as $deduksiBpjsKesehatan)
                 @php
                     $namaBpjsKesehatan = str_replace(' ', '-', $deduksiBpjsKesehatan->name);
@@ -61,8 +63,10 @@
                                 <span> Rp. </span>
                             </div>
                         </div>
-                        <input type="text" class="form-control @error($namaBpjsKesehatan) is-invalid @enderror" name="{{ $namaBpjsKesehatan }}" id="{{ $namaBpjsKesehatan }}"
-                               value="@if(fmod($deduksiBpjsKesehatan->nominal, 1) == 0){{ number_format($deduksiBpjsKesehatan->nominal, 0, ',', '.') }}@else{{ number_format($deduksiBpjsKesehatan->nominal, 2, ',', '.') }}@endif" disabled>
+                        <input type="text" class="form-control @error($namaBpjsKesehatan) is-invalid @enderror"
+                               name="{{ $namaBpjsKesehatan }}" id="{{ $namaBpjsKesehatan }}"
+                               value="@if(fmod($deduksiBpjsKesehatan->nominal, 1) == 0){{ number_format($deduksiBpjsKesehatan->nominal, 0, ',', '.') }}@else{{ number_format($deduksiBpjsKesehatan->nominal, 2, ',', '.') }}@endif"
+                               disabled>
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span> / {{ $deduksiBpjsKesehatan->keterangan }}</span>
@@ -85,7 +89,7 @@
     <div class="col mb-4">
         <h5 style="color: blue">BPJS Ketenagakerjaan</h5>
     </div>
-    @if($data_bpjs_ketenagakerjaan->isNotEmpty())
+    @if($data_bpjs_ketenagakerjaan !== null)
         @foreach($data_bpjs_ketenagakerjaan->chunk(2) as $chunk)
             <div class="form-row">
                 @foreach($chunk as $deduksiBpjsKetenagakerjaan)
@@ -93,10 +97,14 @@
                         $namaBpjsKetenagakerjaan = str_replace(' ', '-', $deduksiBpjsKetenagakerjaan->name);
                     @endphp
                     <div class="col mb-4">
-                        <label for="{{ $namaBpjsKetenagakerjaan }}">{{ ucfirst($deduksiBpjsKetenagakerjaan->name) }}</label>
+                        <label
+                            for="{{ $namaBpjsKetenagakerjaan }}">{{ ucfirst($deduksiBpjsKetenagakerjaan->name) }}</label>
                         <div class="input-group mb-3">
-                            <input type="text" class="form-control @error($namaBpjsKetenagakerjaan) is-invalid @enderror" name="{{ $namaBpjsKetenagakerjaan }}" id="{{ $namaBpjsKetenagakerjaan }}"
-                                   value="{{ number_format($deduksiBpjsKetenagakerjaan->nominal, 2, ',', '.') }} %" disabled>
+                            <input type="text"
+                                   class="form-control @error($namaBpjsKetenagakerjaan) is-invalid @enderror"
+                                   name="{{ $namaBpjsKetenagakerjaan }}" id="{{ $namaBpjsKetenagakerjaan }}"
+                                   value="{{ number_format($deduksiBpjsKetenagakerjaan->nominal, 2, ',', '.') }} %"
+                                   disabled>
                             <div class="input-group-append">
                                 <div class="input-group-text">
                                     <span> / {{ $deduksiBpjsKetenagakerjaan->keterangan }}</span>
@@ -119,10 +127,14 @@
                         $namaBpjsKetenagakerjaanJkk = str_replace(' ', '-', $deduksiBpjsKetenagakerjaanJkk->name);
                     @endphp
                     <div class="col mb-4">
-                        <label for="{{ $namaBpjsKetenagakerjaanJkk }}">Jaminan Kecelakaan Kerja - {{ ucfirst($deduksiBpjsKetenagakerjaanJkk->name) }}</label>
+                        <label for="{{ $namaBpjsKetenagakerjaanJkk }}">Jaminan Kecelakaan Kerja
+                            - {{ ucfirst($deduksiBpjsKetenagakerjaanJkk->name) }}</label>
                         <div class="input-group mb-3">
-                            <input type="text" class="form-control @error($namaBpjsKetenagakerjaanJkk) is-invalid @enderror" name="{{ $namaBpjsKetenagakerjaanJkk }}" id="{{ $namaBpjsKetenagakerjaanJkk }}"
-                                   value="{{ number_format($deduksiBpjsKetenagakerjaanJkk->nominal, 2, ',', '.') }} %" disabled>
+                            <input type="text"
+                                   class="form-control @error($namaBpjsKetenagakerjaanJkk) is-invalid @enderror"
+                                   name="{{ $namaBpjsKetenagakerjaanJkk }}" id="{{ $namaBpjsKetenagakerjaanJkk }}"
+                                   value="{{ number_format($deduksiBpjsKetenagakerjaanJkk->nominal, 2, ',', '.') }} %"
+                                   disabled>
                             <div class="input-group-append">
                                 <div class="input-group-text">
                                     <span> / {{ $deduksiBpjsKetenagakerjaanJkk->keterangan }}</span>
