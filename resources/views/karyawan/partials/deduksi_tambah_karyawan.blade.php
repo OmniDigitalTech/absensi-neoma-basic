@@ -1,11 +1,11 @@
 <div class="col mb-4">
     <h3 style="color: blue">Pengurangan Gaji</h3>
 </div>
-@if(isset($data_deduksi) && isset($data_bpjs_kesehatan) && isset($data_bpjs_ketenagakerjaan) && isset($data_bpjs_ketenagakerjaan_jkk))
+@if(isset($data_deduksi, $data_bpjs_kesehatan, $data_bpjs_ketenagakerjaan, $data_bpjs_ketenagakerjaan_jkk))
     <div class="col mb-4">
         <h5 style="color: blue">UMUM</h5>
     </div>
-    @if($data_deduksi->isNotEmpty())
+    @if($data_deduksi !== [])
         @foreach($data_deduksi->chunk(2) as $chunk)
             <div class="form-row">
                 @foreach($chunk as $deduksi)
@@ -50,7 +50,7 @@
         <h5 style="color: blue">BPJS Kesehatan</h5>
     </div>
     <div class="form-row">
-        @if($data_bpjs_kesehatan !== null)
+        @if($data_bpjs_kesehatan !== [])
             @foreach($data_bpjs_kesehatan as $deduksiBpjsKesehatan)
                 @php
                     $namaBpjsKesehatan = str_replace(' ', '-', $deduksiBpjsKesehatan->name);
@@ -89,7 +89,7 @@
     <div class="col mb-4">
         <h5 style="color: blue">BPJS Ketenagakerjaan</h5>
     </div>
-    @if($data_bpjs_ketenagakerjaan !== null)
+    @if($data_bpjs_ketenagakerjaan !== [])
         @foreach($data_bpjs_ketenagakerjaan->chunk(2) as $chunk)
             <div class="form-row">
                 @foreach($chunk as $deduksiBpjsKetenagakerjaan)
