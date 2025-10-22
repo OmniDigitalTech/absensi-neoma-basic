@@ -78,8 +78,8 @@ class KaryawanService
 //            'dynamicUpah' => $dynamicUpah,
             'deduksi' => $deduksi,
             'bpjsKesehatan' => $bpjsKesehatan,
-            'bpjsKetenagakerjaan' => $getBpjsKetenagakerjaan['bpjsKetenagakerjaan'],
-            'bpjsKetenagakerjaanJkk' => $getBpjsKetenagakerjaan['bpjsKetenagakerjaanJkk']
+            'bpjsKetenagakerjaan' => $getBpjsKetenagakerjaan['bpjsKetenagakerjaan'] ?? [],
+            'bpjsKetenagakerjaanJkk' => $getBpjsKetenagakerjaan['bpjsKetenagakerjaanJkk'] ?? []
         ];
     }
 

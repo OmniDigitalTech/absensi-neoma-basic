@@ -1,7 +1,7 @@
 <div class="col mb-4">
     <h3 style="color: blue">Penjumlahan Gaji</h3>
 </div>
-@if(isset($data_upah))
+@if(!empty($data_upah))
     <div class="form-row">
         <div class="col mb-4">
             <label for="gaji_pokok">Gaji Pokok</label>

@@ -1,7 +1,7 @@
 <div class="col mb-4">
     <h3 style="color: blue">Cuti & Izin</h3>
 </div>
-@if(isset($data_cuti_izin))
+@if(!empty($data_cuti_izin))
     @foreach($data_cuti_izin->chunk(2) as $chunk)
         <div class="form-row">
             @foreach($chunk as $cuti)

@@ -32,7 +32,7 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         settings::create([
-            'name' => 'CV. Neoma Adi Karya Utama',
+            'name' => 'CV. Neoma Creative Hub',
             'logo' => 'assets/img/neoma_logo.jpg',
             'alamat' => 'Jl. Delanggu - Juwiring, Bulan, Kec. Wonosari, Klaten',
             'alamat_ttd' => 'Klaten',
