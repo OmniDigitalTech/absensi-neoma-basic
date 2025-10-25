@@ -27,6 +27,7 @@ use App\Services\EmailService;
 use App\Services\KaryawanService;
 use App\Services\NotifyService;
 use Carbon\Carbon;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -56,7 +57,7 @@ class karyawanController extends Controller
     {
         $search = $request->input('search');
 
-        $data = User::when($search, function ($query) use ($search) {
+        $data = User::query()->when($search, function ($query) use ($search) {
                     $query->where('name', 'LIKE', '%'.$search.'%')
                           ->orWhere('email', 'LIKE', '%'.$search.'%')
                           ->orWhere('telepon', 'LIKE', '%'.$search.'%')
@@ -75,19 +76,19 @@ class karyawanController extends Controller
                 'title' => 'Pegawai',
                 'data_user' => $data
             ]);
-        } else {
-            return view('karyawan.indexUser', [
-                'title' => 'Pegawai',
-                'data_user' => $data
-            ]);
         }
+
+        return view('karyawan.indexUser', [
+            'title' => 'Pegawai',
+            'data_user' => $data
+        ]);
     }
 
     public function euforia()
     {
         date_default_timezone_set('Asia/Jakarta');
 
-        $data = User::where('tgl_lahir', date('Y-m-d'))
+        $data = User::query()->where('tgl_lahir', date('Y-m-d'))
                 ->orderBy('name', 'ASC')
                 ->paginate(10000)
                 ->withQueryString();
@@ -100,7 +101,7 @@ class karyawanController extends Controller
 
     public function show($id)
     {
-        $user = User::find($id);
+        $user = User::query()->find($id);
 
         return view('karyawan.show', [
             'title' => 'Detail Karyawan',
@@ -122,6 +123,9 @@ class karyawanController extends Controller
         return back()->with('success', 'Data Berhasil Di Import');
     }
 
+    /**
+     * @throws \Throwable
+     */
     private function getKaryawanBenefits($golonganId, $tipeKaryawan) {
         $karyawanBenefits = $this->karyawanService->getCutiIzinUpahDeduksiKaryawan($golonganId, $tipeKaryawan);
         $cutiIzin = collect($karyawanBenefits['cuti_izin']);
@@ -158,7 +162,7 @@ class karyawanController extends Controller
             "title" => 'Tambah Pegawai',
             "data_jabatan" => Jabatan::query()->select('id', 'nama_jabatan')->get(),
             "data_golongan" => Golongan::query()->select('id', 'name')->get(),
-            "data_lokasi" => Lokasi::where('status', 'approved')->get()
+            "data_lokasi" => Lokasi::query()->where('status', 'approved')->get()
         ]);
     }
 
@@ -196,7 +200,7 @@ class karyawanController extends Controller
 
         $validatedData['password'] = Hash::make($validatedData['password']);
 //        Log::info(json_encode($validatedData, JSON_THROW_ON_ERROR));
-        User::create($validatedData);
+        User::query()->create($validatedData);
         return redirect('/pegawai')->with('success', 'Data Berhasil di Tambahkan');
     }
 
@@ -208,26 +212,26 @@ class karyawanController extends Controller
             $changedTipeKaryawan = $request->input('tipe_karyawan');
 
             return $this->getKaryawanBenefits($changedGolonganId, $changedTipeKaryawan);
-        } else {
-            $golonganId = User::query()->find($id)->golongan_id;
-            $tipeKaryawan = User::query()->find($id)->tipe_karyawan;
-
-            $karyawanBenefits = $this->karyawanService->getCutiIzinUpahDeduksiKaryawan($golonganId, $tipeKaryawan);
-            $cutiIzin = $karyawanBenefits['cuti_izin'];
-            $upah = $karyawanBenefits['upah'];
-//            $dynamicUpah = $karyawanBenefits['dynamicUpah'];
-            $deduksi = $karyawanBenefits['deduksi'];
-            $bpjsKesehatan = $karyawanBenefits['bpjsKesehatan'];
-            $bpjsKetenagakerjaan = $karyawanBenefits['bpjsKetenagakerjaan'];
-            $bpjsKetenagakerjaanJkk = $karyawanBenefits['bpjsKetenagakerjaanJkk'];
         }
+
+        $golonganId = User::query()->find($id)->golongan_id;
+        $tipeKaryawan = User::query()->find($id)->tipe_karyawan;
+
+        $karyawanBenefits = $this->karyawanService->getCutiIzinUpahDeduksiKaryawan($golonganId, $tipeKaryawan);
+        $cutiIzin = $karyawanBenefits['cuti_izin'];
+        $upah = $karyawanBenefits['upah'];
+//            $dynamicUpah = $karyawanBenefits['dynamicUpah'];
+        $deduksi = $karyawanBenefits['deduksi'];
+        $bpjsKesehatan = $karyawanBenefits['bpjsKesehatan'];
+        $bpjsKetenagakerjaan = $karyawanBenefits['bpjsKetenagakerjaan'];
+        $bpjsKetenagakerjaanJkk = $karyawanBenefits['bpjsKetenagakerjaanJkk'];
 
         return view('karyawan.editkaryawan', [
             'title' => 'Detail Pegawai',
-            'karyawan' => User::find($id),
+            'karyawan' => User::query()->find($id),
             'data_jabatan' => Jabatan::all(),
             'data_golongan' => Golongan::all(),
-            'data_lokasi' => Lokasi::where('status', 'approved')->get(),
+            'data_lokasi' => Lokasi::query()->where('status', 'approved')->get(),
             'data_cuti_izin' => $cutiIzin,
             'data_upah' =>  $upah,
 //            'data_dynamic_upah' =>  $dynamicUpah,
@@ -238,6 +242,9 @@ class karyawanController extends Controller
         ]);
     }
 
+    /**
+     * @throws FileNotFoundException
+     */
     public function editKaryawanProses(Request $request, $id)
     {
 //        if($request["izin_cuti"] === null) {
@@ -314,13 +321,13 @@ class karyawanController extends Controller
         ];
 
 
-        $userId = User::find($id);
+        $userId = User::query()->find($id);
 
-        if ($request->email !== $userId->email) {
+        if ($request->email !== $userId?->email) {
             $rules['email'] = 'required|email:dns|unique:users';
         }
 
-        if ($request->username !== $userId->username) {
+        if ($request->username !== $userId?->username) {
             $rules['username'] = 'required|max:255|unique:users';
         }
 
@@ -355,36 +362,39 @@ class karyawanController extends Controller
         $dataface = json_decode($neural, true);
 
         foreach ($dataface as &$item) {
-            if ($item['label'] === $userId->username) {
+            if ($item['label'] === $userId?->username) {
                 $item['label'] = $request->username;
             }
         }
         File::put($path, json_encode($dataface, JSON_PRETTY_PRINT));
 
-        User::where('id', $id)->update($validatedData);
+        User::query()->where('id', $id)->update($validatedData);
         $request->session()->flash('success', 'Data Berhasil di Update');
         return redirect('/pegawai');
     }
 
+    /**
+     * @throws FileNotFoundException
+     */
     public function deleteKaryawan($id)
     {
-        $delete = User::find($id);
-        MappingShift::where('user_id', $id)->delete();
-        Lembur::where('user_id', $id)->delete();
-        Cuti::where('user_id', $id)->delete();
-        Sip::where('user_id', $id)->delete();
-        Payroll::where('user_id', $id)->delete();
+        $delete = User::query()->find($id);
+        MappingShift::query()->where('user_id', $id)->delete();
+        Lembur::query()->where('user_id', $id)->delete();
+        Cuti::query()->where('user_id', $id)->delete();
+        Sip::query()->where('user_id', $id)->delete();
+        Payroll::query()->where('user_id', $id)->delete();
         Storage::delete($delete->foto_karyawan);
         Storage::delete($delete->ttd_karyawan);
         $path = public_path('neural.json');
         $neural = File::get($path);
         $dataface = json_decode($neural, true);
 
-        $filterface = array_filter($dataface, function($item) use ($delete) {
+        $filterface = array_filter($dataface, static function($item) use ($delete) {
             return $item['label'] !== $delete->username;
         });
         File::put($path, json_encode(array_values($filterface), JSON_PRETTY_PRINT));
-        $delete->delete();
+        $delete?->delete();
         return redirect('/pegawai')->with('success', 'Data Berhasil di Delete');
     }
 
@@ -392,7 +402,7 @@ class karyawanController extends Controller
     {
         return view('karyawan.editpassword', [
             'title' => 'Edit Password',
-            'karyawan' => User::find($id)
+            'karyawan' => User::query()->find($id)
         ]);
     }
 
@@ -400,10 +410,13 @@ class karyawanController extends Controller
     {
         return view('karyawan.face', [
             'title' => 'Daftar Wajah',
-            'karyawan' => User::find($id)
+            'karyawan' => User::query()->find($id)
         ]);
     }
 
+    /**
+     * @throws FileNotFoundException
+     */
     public function ajaxDescrip(Request $request)
     {
         $path = public_path('neural.json');
@@ -440,7 +453,7 @@ class karyawanController extends Controller
 
         Storage::put($fileName, $image_base64);
 
-        $user = User::where('username', $request['path'])->update(["foto_face_recognition" => $fileName]);
+        $user = User::query()->where('username', $request['path'])->update(["foto_face_recognition" => $fileName]);
         return $user;
     }
 
@@ -452,29 +465,29 @@ class karyawanController extends Controller
 
         $validatedData['password'] = Hash::make($request->password);
 
-        User::where('id', $id)->update($validatedData);
+        User::query()->where('id', $id)->update($validatedData);
         $request->session()->flash('success', 'Password Berhasil Diganti');
         return redirect('/pegawai');
     }
 
     public function shift($id, Request $request)
     {
-        $mapping_shift = MappingShift::where('user_id', $id)
+        $mapping_shift = MappingShift::query()->where('user_id', $id)
                                     ->orderBy('tanggal', 'DESC')
                                     ->paginate(31)
                                     ->withQueryString();
 
-        if($request["mulai"] == null) {
+        if($request["mulai"] === null) {
             $request["mulai"] = $request["akhir"];
         }
 
-        if($request["akhir"] == null) {
+        if($request["akhir"] === null) {
             $request["akhir"] = $request["mulai"];
         }
 
         if ($request["mulai"] && $request["akhir"]) {
         //    Log::info('masuk');
-            $mapping_shift = MappingShift::where('user_id', $id)
+            $mapping_shift = MappingShift::query()->where('user_id', $id)
                                     ->whereBetween('tanggal', [$request["mulai"], $request["akhir"]])
                                     ->orderBy('tanggal', 'DESC')
                                     ->paginate(31)
@@ -483,7 +496,7 @@ class karyawanController extends Controller
 
         return view('karyawan.mappingshift', [
             'title' => 'Mapping Shift',
-            'karyawan' => User::find($id),
+            'karyawan' => User::query()->find($id),
             'shift_karyawan' => $mapping_shift,
             'shift' => Shift::all()
         ]);
@@ -493,22 +506,23 @@ class karyawanController extends Controller
 
     public function dinasLuar($id, Request $request)
     {
-        $dinas_luar = dinasLuar::where('user_id', $id)
+        $dinas_luar = dinasLuar::query()->where('user_id', $id)
                         ->orderBy('tanggal', 'DESC')
                         ->paginate(31)
                         ->withQueryString();
 
-        if($request["mulai"] == null) {
-        $request["mulai"] = $request["akhir"];
+        if($request["mulai"] === null) {
+            $request["mulai"] = $request["akhir"];
         }
 
-        if($request["akhir"] == null) {
-        $request["akhir"] = $request["mulai"];
+        if($request["akhir"] === null) {
+            $request["akhir"] = $request["mulai"];
         }
 
         if ($request["mulai"] && $request["akhir"]) {
         //    Log::info('masuk');
-        $dinas_luar = dinasLuar::where('user_id', $id)
+
+        $dinas_luar = dinasLuar::query()->where('user_id', $id)
                 ->whereBetween('tanggal', [$request["mulai"], $request["akhir"]])
                 ->orderBy('tanggal', 'DESC')
                 ->paginate(31)
@@ -517,33 +531,44 @@ class karyawanController extends Controller
 
         return view('karyawan.dinasluar', [
             'title' => 'Mapping Dinas Luar',
-            'karyawan' => User::find($id),
+            'karyawan' => User::query()->find($id),
             'dinas_luar' => $dinas_luar,
             'shift' => Shift::all()
             ]);
         }
 
+    /**
+     * @throws \DateMalformedStringException
+     * @throws \DateMalformedPeriodStringException
+     */
     public function prosesTambahShift(Request $request)
     {
         date_default_timezone_set('Asia/Jakarta');
+
+        if($request["tanggal_mulai"] === null) {
+            $request["tanggal_mulai"] = $request["tanggal_akhir"];
+        }
+
+        if($request["tanggal_akhir"] === null) {
+            $request["tanggal_akhir"] = $request["tanggal_mulai"];
+        }
+
+        $userId = $request['user_id'];
+        $tglMulai = $request['tanggal_mulai'];
+        $tglAkhir = $request['tanggal_akhir'];
+
+        $isAvailable = $this->karyawanService->isCutiIzinScheduleAvailable($userId, $tglMulai, $tglAkhir);
+
+        if(!$isAvailable) {
+            Alert::error('Peringatan!', 'Tanggal "'.$tglMulai.' sampai '.$tglAkhir.'" sudah ada ajuan Cuti/Izin');
+            return redirect('/cuti');
+        }
 
         $request->validate([
             'shift_id' => 'required',
             'tanggal_mulai' => 'required',
             'tanggal_akhir' => 'required',
         ]);
-
-        if($request["tanggal_mulai"] == null) {
-            $request["tanggal_mulai"] = $request["tanggal_akhir"];
-        } else {
-            $request["tanggal_mulai"] = $request["tanggal_mulai"];
-        }
-
-        if($request["tanggal_akhir"] == null) {
-            $request["tanggal_akhir"] = $request["tanggal_mulai"];
-        } else {
-            $request["tanggal_akhir"] = $request["tanggal_akhir"];
-        }
 
         $begin = new \DateTime($request["tanggal_mulai"]);
         $end = new \DateTime($request["tanggal_akhir"]);
@@ -556,10 +581,10 @@ class karyawanController extends Controller
         foreach ($daterange as $date) {
             $tanggal = $date->format("Y-m-d");
 
-            $cek = MappingShift::where('user_id', $request['user_id'])->where('tanggal', $tanggal)->first();
+            $cek = MappingShift::query()->where('user_id', $request['user_id'])->where('tanggal', $tanggal)->first();
 
             if (!$cek) {
-                if ($request["shift_id"] == 1) {
+                if ($request["shift_id"] === 1) {
                     $request["status_absen"] = "Libur";
                 } else {
                     $request["status_absen"] = "Tidak Masuk";
@@ -574,7 +599,7 @@ class karyawanController extends Controller
                     'status_absen' => 'required',
                 ]);
 
-                $validatedData['lock_location'] = $request['lock_location'] ? $request['lock_location'] : null;
+                $validatedData['lock_location'] = $request['lock_location'] ?: null;
                 $validatedData['telat'] = 0;
                 $validatedData['pulang_cepat'] = 0;
 
@@ -584,20 +609,31 @@ class karyawanController extends Controller
         return redirect('/pegawai/shift/' . $request["user_id"])->with('success', 'Data Berhasil di Tambahkan');
     }
 
+    /**
+     * @throws \DateMalformedStringException
+     * @throws \DateMalformedPeriodStringException
+     */
     public function prosesTambahDinas(Request $request)
     {
         date_default_timezone_set('Asia/Jakarta');
 
-        if($request["tanggal_mulai"] == null) {
+        if($request["tanggal_mulai"] === null) {
             $request["tanggal_mulai"] = $request["tanggal_akhir"];
-        } else {
-            $request["tanggal_mulai"] = $request["tanggal_mulai"];
         }
 
-        if($request["tanggal_akhir"] == null) {
+        if($request["tanggal_akhir"] === null) {
             $request["tanggal_akhir"] = $request["tanggal_mulai"];
-        } else {
-            $request["tanggal_akhir"] = $request["tanggal_akhir"];
+        }
+
+        $userId = $request['user_id'];
+        $tglMulai = $request['tanggal_mulai'];
+        $tglAkhir = $request['tanggal_akhir'];
+
+        $isAvailable = $this->karyawanService->isCutiIzinScheduleAvailable($userId, $tglMulai, $tglAkhir);
+
+        if(!$isAvailable) {
+            Alert::error('Peringatan!', 'Tanggal "'.$tglMulai.' sampai '.$tglAkhir.'" sudah ada ajuan Cuti/Izin');
+            return redirect('/cuti');
         }
 
         $begin = new \DateTime($request["tanggal_mulai"]);
@@ -611,7 +647,7 @@ class karyawanController extends Controller
         foreach ($daterange as $date) {
             $tanggal = $date->format("Y-m-d");
 
-            if ($request["shift_id"] == 1) {
+            if ($request["shift_id"] === 1) {
                 $request["status_absen"] = "Libur";
             } else {
                 $request["status_absen"] = "Tidak Masuk";
@@ -626,22 +662,26 @@ class karyawanController extends Controller
                 'status_absen' => 'required',
             ]);
 
-            dinasLuar::create($validatedData);
+            dinasLuar::query()->create($validatedData);
         }
         return redirect('/pegawai/dinas-luar/' . $request["user_id"])->with('success', 'Data Berhasil di Tambahkan');
     }
 
     public function deleteShift(Request $request, $id)
     {
-        $delete = MappingShift::find($id);
-        $delete->delete();
+        $delete = MappingShift::query()->find($id);
+
+        $delete?->delete();
+
         return redirect('/pegawai/shift/' . $request["user_id"])->with('success', 'Data Berhasil di Delete');
     }
 
     public function deleteDinas(Request $request, $id)
     {
-        $delete = dinasLuar::find($id);
-        $delete->delete();
+        $delete = dinasLuar::query()->find($id);
+
+        $delete?->delete();
+
         return redirect('/pegawai/dinas-luar/' . $request["user_id"])->with('success', 'Data Berhasil di Delete');
     }
 
@@ -649,7 +689,7 @@ class karyawanController extends Controller
     {
         return view('karyawan.editshift', [
             'title' => 'Edit Shift',
-            'shift_karyawan' => MappingShift::find($id),
+            'shift_karyawan' => MappingShift::query()->find($id),
             'shift' => Shift::all()
         ]);
     }
@@ -658,7 +698,7 @@ class karyawanController extends Controller
     {
         return view('karyawan.editdinas', [
             'title' => 'Edit Dinas',
-            'dinas_luar' => dinasLuar::find($id),
+            'dinas_luar' => dinasLuar::query()->find($id),
             'shift' => Shift::all()
         ]);
     }
@@ -668,7 +708,7 @@ class karyawanController extends Controller
         date_default_timezone_set('Asia/Jakarta');
 
 
-        if ($request["shift_id"] == 1) {
+        if ($request["shift_id"] === 1) {
             $request["status_absen"] = "Libur";
         } else {
             $request["status_absen"] = "Tidak Masuk";
@@ -680,9 +720,9 @@ class karyawanController extends Controller
             'status_absen' => 'required'
         ]);
 
-        $validatedData['lock_location'] = $request['lock_location'] ? $request['lock_location'] : null;
+        $validatedData['lock_location'] = $request['lock_location'] ?: null;
 
-        MappingShift::where('id', $id)->update($validatedData);
+        MappingShift::query()->where('id', $id)->update($validatedData);
         return redirect('/pegawai/shift/' . $request["user_id"])->with('success', 'Data Berhasil di Update');
     }
 
@@ -691,7 +731,7 @@ class karyawanController extends Controller
         date_default_timezone_set('Asia/Jakarta');
 
 
-        if ($request["shift_id"] == 1) {
+        if ($request["shift_id"] === 1) {
             $request["status_absen"] = "Libur";
         } else {
             $request["status_absen"] = "Tidak Masuk";
@@ -703,24 +743,24 @@ class karyawanController extends Controller
             'status_absen' => 'required'
         ]);
 
-        dinasLuar::where('id', $id)->update($validatedData);
+        dinasLuar::query()->where('id', $id)->update($validatedData);
         return redirect('/pegawai/dinas-luar/' . $request["user_id"])->with('success', 'Data Berhasil di Update');
     }
 
     public function myProfile()
     {
-        if (auth()->user()->is_admin == 'admin') {
+        if (auth()->user()->is_admin === 'admin') {
             return view('karyawan.myprofile', [
                 'title' => 'My Profile',
                 'data_jabatan' => Jabatan::all()
             ]);
 
-        } else {
-            return view('karyawan.myprofileuser', [
-                'title' => 'My Profile',
-                'data_jabatan' => Jabatan::all()
-            ]);
         }
+
+        return view('karyawan.myprofileuser', [
+            'title' => 'My Profile',
+            'data_jabatan' => Jabatan::all()
+        ]);
     }
 
     public function myProfileUpdate(Request $request, $id)
@@ -739,13 +779,13 @@ class karyawanController extends Controller
         ];
 
 
-        $userId = User::find($id);
+        $userId = User::query()->find($id);
 
-        if ($request->email != $userId->email) {
+        if ($request->email !== $userId->email) {
             $rules['email'] = 'required|email:dns|unique:users';
         }
 
-        if ($request->username != $userId->username) {
+        if ($request->username !== $userId->username) {
             $rules['username'] = 'required|max:255|unique:users';
         }
 
@@ -759,7 +799,7 @@ class karyawanController extends Controller
         }
 
         $path = public_path('neural.json');
-        $neural = File::get($path);
+        $neural = File::query()->get($path);
         $dataface = json_decode($neural, true);
 
         foreach ($dataface as &$item) {
@@ -769,22 +809,22 @@ class karyawanController extends Controller
         }
         File::put($path, json_encode($dataface, JSON_PRETTY_PRINT));
 
-        User::where('id', $id)->update($validatedData);
+        User::query()->where('id', $id)->update($validatedData);
         $request->session()->flash('success', 'Data Berhasil di Update');
         return redirect('/my-profile');
     }
 
     public function editPassMyProfile()
     {
-        if (auth()->user()->is_admin == 'admin') {
+        if (auth()->user()->is_admin === 'admin') {
             return view('karyawan.editpassmyprofile', [
                 'title' => 'Ganti Password'
             ]);
-        } else {
-            return view('karyawan.editpassworduser', [
-                'title' => 'Ganti Password'
-            ]);
         }
+
+        return view('karyawan.editpassworduser', [
+            'title' => 'Ganti Password'
+        ]);
 
     }
 
@@ -796,7 +836,7 @@ class karyawanController extends Controller
 
         $validatedData['password'] = Hash::make($request->password);
 
-        User::where('id', $id)->update($validatedData);
+        User::query()->where('id', $id)->update($validatedData);
         $request->session()->flash('success', 'Password Berhasil di Update');
         return redirect('/dashboard');
     }
@@ -805,7 +845,7 @@ class karyawanController extends Controller
     {
         return view('karyawan.masterreset', [
             'title' => 'Master Data Reset Cuti',
-            'data_cuti' => ResetCuti::first()
+            'data_cuti' => ResetCuti::query()->first()
         ]);
     }
 
@@ -822,7 +862,7 @@ class karyawanController extends Controller
             'izin_pulang_cepat' => 'required'
         ]);
 
-        ResetCuti::where('id', $id)->update($validatedData);
+        ResetCuti::query()->where('id', $id)->update($validatedData);
         return redirect('/reset-cuti')->with('success', 'Master Cuti Berhasil Diupdate');
     }
 

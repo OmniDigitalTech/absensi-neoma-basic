@@ -13,19 +13,19 @@
                 </div>
                 <div class="group-input">
                     @php
-                    $izin_cuti = $data_user->izin_cuti;
-                    $izin_lainnya = $data_user->izin_lainnya;
-                    $izin_telat = $data_user->izin_telat;
-                    $izin_pulang_cepat = $data_user->izin_pulang_cepat;
+                    $izin_cuti = $data_cuti[0]->jumlah;
+                    $izin_masuk = $data_cuti[1]->jumlah;
+                    $izin_telat = $data_cuti[2]->jumlah;
+                    $izin_pulang_cepat = $data_cuti[3]->jumlah;
 
-                    $data_cuti = array(
+                    $array_data_cuti = array(
                     [
                     'nama' => 'Cuti',
                     'nama_cuti' => 'Cuti ('.$izin_cuti.')'
                     ],
                     [
                     'nama' => 'Izin Masuk',
-                    'nama_cuti' => 'Izin Masuk ('.$izin_lainnya.')'
+                    'nama_cuti' => 'Izin Masuk ('.$izin_masuk.')'
                     ],
                     [
                     'nama' => 'Izin Telat',
@@ -41,8 +41,8 @@
                     <select class="select2 @error('nama_cuti') is-invalid @enderror" id="nama_cuti" name="nama_cuti"
                         data-live-search="true">
                         <option value="">Pilih Cuti</option>
-                        @foreach ($data_cuti as $dc)
-                        @if(old('nama_cuti') == $dc["nama"])
+                        @foreach ($array_data_cuti as $dc)
+                        @if(old('nama_cuti') === $dc["nama"])
                         <option value="{{ $dc["nama"] }}" selected>{{ $dc["nama_cuti"] }}</option>
                         @else
                         <option value="{{ $dc["nama"] }}">{{ $dc["nama_cuti"] }}</option>

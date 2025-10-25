@@ -23,7 +23,7 @@
                                     data-live-search="true">
                                 <option value="" selected>Pilih Pegawai</option>
                                 @foreach($user as $u)
-                                    @if(request('user_id') == $u->id)
+                                    @if(request('user_id') === $u->id)
                                         <option value="{{ $u->id }}" selected>{{ $u->name }}</option>
                                     @else
                                         <option value="{{ $u->id }}">{{ $u->name }}</option>
@@ -77,9 +77,9 @@
                                         onclick="showModal(this, '{{ url('storage/'.$dc->foto_cuti) }}')">
                                 </td>
                                 <td>
-                                    @if($dc->status_cuti == "Diterima")
+                                    @if($dc->status_cuti === "Diterima")
                                     <span class="badge badge-success">{{ $dc->status_cuti }}</span>
-                                    @elseif($dc->status_cuti == "Ditolak")
+                                    @elseif($dc->status_cuti === "Ditolak")
                                     <span class="badge badge-danger">{{ $dc->status_cuti }}</span>
                                     @else
                                     <span class="badge badge-warning">{{ $dc->status_cuti }}</span>
@@ -96,7 +96,7 @@
                                             target="_blank"><i style="color:cyan" class="fa fa-eye"></i></a>
 {{--                                        @endif--}}
 
-                                        @if($dc->status_cuti == "Diterima")
+                                        @if($dc->status_cuti === "Diterima")
                                         <li class="me-2">
                                             <span class="badge badge-success">Sudah Approve</span>
                                         </li>
@@ -108,7 +108,7 @@
                                             <a href="{{ url('/data-cuti/edit/'.$dc->id) }}"><i style="color: blue"
                                                     class="fas fa-edit"></i></a>
                                         </li> @endif
-                                        @if($dc->status_cuti == "Diterima")
+                                        @if($dc->status_cuti === "Diterima")
                                         <li>
                                             <span class="badge badge-success">Sudah Approve</span>
                                         </li>

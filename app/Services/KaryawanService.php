@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Cuti;
 use App\Models\DataCuti;
 use App\Models\Deduksi;
 use App\Models\DynamicUpah;
@@ -13,6 +14,38 @@ use App\Models\Upah;
 
 class KaryawanService
 {
+    /**
+     * Memeriksa ketersediaan jadwal cuti untuk seorang user.
+     *
+     * @param int $userId
+     * @param string $tglMulai
+     * @param string $tglAkhir
+     * @return bool - true jika tersedia, false jika sudah ada
+     */
+    public function isCutiIzinScheduleAvailable(int $userId, string $tglMulai, string $tglAkhir): bool
+    {
+        $isOverlap = Cuti::query()
+            ->where('user_id', $userId)
+            ->where('tanggal_mulai', '<=', $tglAkhir)
+            ->where('tanggal_akhir', '>=', $tglMulai)
+            ->where(function ($query) {
+                $query->where('approval1', '!=', 'ditolak')
+                    ->orWhereNull('approval1');
+            })
+            ->where(function ($query) {
+                $query->where('approval2', '!=', 'ditolak')
+                    ->orWhereNull('approval2');
+            })
+            ->where(function ($query) {
+                $query->where('approval3', '!=', 'ditolak')
+                    ->orWhereNull('approval3');
+            })
+            ->exists();
+
+        // Jika data tumpang tindih DITEMUKAN (true), maka jadwal TIDAK TERSEDIA (return false)
+        return !$isOverlap;
+    }
+
     public function getCutiIzinUpahDeduksiKaryawan ($golonganId, $tipeKaryawan): array
     {
         $settings = settings::query()->first();
