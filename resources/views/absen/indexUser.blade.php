@@ -80,6 +80,7 @@ function waktu() {
         <input type="hidden" name="lat" id="lat2">
         <input type="hidden" name="long" id="long2">
         <input type="hidden" name="userid" value="{{ auth()->user()->id }}">
+        <input type="hidden" name="page" value="absen">
         <button type="submit" class="btn btn-success">Lihat Lokasi Saya</button>
     </form>
 </div>
@@ -89,11 +90,11 @@ function waktu() {
     <center>
         <h2>Hubungi Admin Untuk Input Shift Anda</h2>
     </center>
-    @elseif($shift_karyawan->status_absen == 'Libur')
+    @elseif($shift_karyawan->status_absen === 'Libur')
     <center>
         <h2>Hari Ini Anda Libur</h2>
     </center>
-    @elseif($shift_karyawan->status_absen == "Cuti")
+    @elseif($shift_karyawan->status_absen === "Cuti")
     <center>
         <h2>Hari Ini Anda Cuti</h2>
     </center>
@@ -102,7 +103,7 @@ function waktu() {
         <h2>Hari Ini Anda Izin Masuk</h2>
     </center>
     @else
-    @if ($shift_karyawan->jam_absen == null)
+    @if ($shift_karyawan->jam_absen === null)
     <form class="tf-form" action="{{ url('/absen/masuk/'.$shift_karyawan->id) }}" method="POST">
         @method('PUT')
         @csrf
@@ -111,7 +112,7 @@ function waktu() {
                 <h2>Absen Masuk: </h2>
                 <div class="webcam mb-4" id="results"></div>
             </center>
-            @if ($shift_karyawan->lock_location == null)
+            @if ($shift_karyawan->lock_location === null)
             <div class="group-input">
                 <!-- <label>Keterangan Masuk</label> -->
                 <!-- <textarea name="keterangan_masuk" class="@error('keterangan_masuk') is-invalid @enderror">{{ old('keterangan_masuk') }}</textarea>

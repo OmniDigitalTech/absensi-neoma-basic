@@ -41,23 +41,23 @@ class OncallController extends Controller
         } else {
             $jam_keluar = "-";
         }
-        if ($jam_keluar == null) {
+        if ($jam_keluar === null) {
             $tanggal = $tglkmrn;
         } else {
             $tanggal = $tglskrg;
         }
 
-        if (auth()->user()->is_admin == 'admin') {
+        if (auth()->user()->is_admin === 'admin') {
             return view('oncall.index', [
-                'title' => 'Oncall',
-                'oncall' => Oncall::where('user_id', $user_login)->where('tanggal', $tanggal)->get()
-            ]);
-        } else {
-            return view('oncall.indexuser', [
-                'title' => 'Oncall',
-                'oncall' => Oncall::where('user_id', $user_login)->where('tanggal', $tanggal)->first()
+                'title' => 'Absen Oncall Admin',
+                'oncall' => Oncall::query()->where('user_id', $user_login)->where('tanggal', $tanggal)->get()
             ]);
         }
+
+        return view('oncall.indexUser', [
+            'title' => 'Absen Oncall Karyawan',
+            'oncall' => Oncall::query()->where('user_id', $user_login)->where('tanggal', $tanggal)->first()
+        ]);
     }
 
     public function distance($lat1, $lon1, $lat2, $lon2, $unit)
@@ -69,13 +69,15 @@ class OncallController extends Controller
         $miles = $dist * 60 * 1.1515;
         $unit = strtoupper($unit);
 
-        if ($unit == "K") {
+        if ($unit === "K") {
             return ($miles * 1.609344);
-        } else if ($unit == "N") {
-            return ($miles * 0.8684);
-        } else {
-            return $miles;
         }
+
+        if ($unit === "N") {
+            return ($miles * 0.8684);
+        }
+
+        return $miles;
     }
 
     public function masuk(Request $request)

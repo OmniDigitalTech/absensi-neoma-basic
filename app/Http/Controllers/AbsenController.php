@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use App\Events\NotifApproval;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class AbsenController extends Controller
@@ -23,7 +24,7 @@ class AbsenController extends Controller
         $tanggal = "";
         $tglskrg = date('Y-m-d');
         $tglkmrn = date('Y-m-d', strtotime('-1 days'));
-        $mapping_shift = MappingShift::where('user_id', $user_login)->where('tanggal', $tglkmrn)->get();
+        $mapping_shift = MappingShift::query()->where('user_id', $user_login)->where('tanggal', $tglkmrn)->get();
         if($mapping_shift->count() > 0) {
             foreach($mapping_shift as $mp) {
                 $jam_absen = $mp->jam_absen;
@@ -33,28 +34,57 @@ class AbsenController extends Controller
             $jam_absen = "-";
             $jam_pulang = "-";
         }
-        if($jam_absen != null && $jam_pulang == null) {
+        if($jam_absen !== null && $jam_pulang === null) {
             $tanggal = $tglkmrn;
         } else {
             $tanggal = $tglskrg;
         }
 
-        if (auth()->user()->is_admin == 'admin') {
+        if (auth()->user()->is_admin === 'admin') {
             return view('absen.index', [
-                'title' => 'Absen',
-                'shift_karyawan' => MappingShift::where('user_id', $user_login)->where('tanggal', $tanggal)->first()
-            ]);
-        } else {
-            return view('absen.indexUser', [
-                'title' => 'Absen Karyawan',
-                'shift_karyawan' => MappingShift::where('user_id', $user_login)->where('tanggal', $tanggal)->first()
+                'title' => 'Absen Hadir Admin',
+                'shift_karyawan' => MappingShift::query()->where('user_id', $user_login)->where('tanggal', $tanggal)->first()
             ]);
         }
 
+        return view('absen.indexUser', [
+            'title' => 'Absen Hadir Karyawan',
+            'shift_karyawan' => MappingShift::query()->where('user_id', $user_login)->where('tanggal', $tanggal)->first()
+        ]);
     }
 
     public function myLocation(Request $request)
     {
+        $rules = [
+            'lat' => 'required',
+            'long' => 'required',
+            'userid' => 'required',
+            'page' => 'required'
+        ];
+
+        // Pesan error custom jika perlu
+        $messages = [
+            'lat.required' => 'Lokasi latitude wajib diisi.',
+            'long.required' => 'Lokasi longitude wajib diisi.',
+            'userid.required' => 'User belum login',
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $messages);
+
+        if ($validator->fails()) {
+            Alert::error('Validasi Gagal', 'Data yang Anda masukkan tidak lengkap.');
+            return redirect('/'.$request['page']);
+
+            // (Opsional) Mengembalikan response JSON custom (untuk API)
+            // return response()->json([
+            //     'status' => 'error',
+            //     'message' => 'Validasi gagal, silakan cek data Anda.',
+            //     'errors' => $validator->errors() // Mengirim detail error-nya
+            // ], 400); // Kirim status 400 Bad Request
+        }
+
+        $validatedData = $validator->validated();
+
         return redirect('maps/'.$request["lat"].'/'.$request['long'].'/'.$request['userid']);
     }
 
@@ -82,7 +112,7 @@ class AbsenController extends Controller
             $image_parts = explode(";base64,", $foto_jam_absen);
 
             $image_base64 = base64_decode($image_parts[1]);
-            $fileName = 'foto_jam_absen/' . uniqid() . '.png';
+            $fileName = 'foto_jam_absen/' . uniqid('', true) . '.png';
 
             Storage::disk('public')->put($fileName, $image_base64);
 
@@ -106,7 +136,7 @@ class AbsenController extends Controller
                 $request["telat"] = $diff;
             }
 
-            if ($mapping_shift->lock_location == 1) {
+            if ($mapping_shift->lock_location === 1) {
                 $validatedData = $request->validate([
                     'jam_absen' => 'required',
                     'telat' => 'nullable',
@@ -150,9 +180,9 @@ class AbsenController extends Controller
 
         $request["jarak_pulang"] = $this->distance($request["lat_pulang"], $request["long_pulang"], $lat_kantor, $long_kantor, "K") * 1000;
 
-        $mapping_shift = MappingShift::find($id);
+        $mapping_shift = MappingShift::query()->find($id);
 
-        if($request["jarak_pulang"] > $radius && $mapping_shift->lock_location == 1) {
+        if($request["jarak_pulang"] > $radius && $mapping_shift->lock_location === 1) {
             Alert::error('Diluar Jangkauan', 'Lokasi Anda Diluar Radius ' . $nama_lokasi);
             return redirect('/absen');
         } else {
@@ -161,7 +191,7 @@ class AbsenController extends Controller
             $image_parts = explode(";base64,", $foto_jam_pulang);
 
             $image_base64 = base64_decode($image_parts[1]);
-            $fileName = 'foto_jam_pulang/' . uniqid() . '.png';
+            $fileName = 'foto_jam_pulang/' . uniqid('', true) . '.png';
 
             Storage::disk('public')->put($fileName, $image_base64);
 
@@ -194,7 +224,7 @@ class AbsenController extends Controller
                 $request["pulang_cepat"] = $diff;
             }
 
-            if ($mapping_shift->lock_location == 1) {
+            if ($mapping_shift->lock_location === 1) {
                 $validatedData = $request->validate([
                     'jam_pulang' => 'required',
                     'foto_jam_pulang' => 'required',
@@ -215,7 +245,7 @@ class AbsenController extends Controller
                 ]);
             }
 
-            MappingShift::where('id', $id)->update($validatedData);
+            MappingShift::query()->where('id', $id)->update($validatedData);
 
             return redirect('/absen')->with('success', 'Berhasil Absen Pulang');
         }
@@ -230,9 +260,9 @@ class AbsenController extends Controller
         $miles = $dist * 60 * 1.1515;
         $unit = strtoupper($unit);
 
-        if ($unit == "K") {
+        if ($unit === "K") {
             return ($miles * 1.609344);
-        } else if ($unit == "N") {
+        } else if ($unit === "N") {
             return ($miles * 0.8684);
         } else {
             return $miles;
@@ -246,7 +276,7 @@ class AbsenController extends Controller
 
         return view('absen.dataabsen', [
             'title' => 'Data Absen',
-            'user' => User::select('id', 'name')->get(),
+            'user' => User::query()->select('id', 'name')->get(),
             'data_absen' => $data_absen
         ]);
     }
@@ -259,27 +289,28 @@ class AbsenController extends Controller
     public function maps($lat, $long, $userid)
     {
         date_default_timezone_set('Asia/Jakarta');
-        if (auth()->user()->is_admin == 'admin') {
+
+        if (auth()->user()->is_admin === 'admin') {
             return view('absen.maps', [
                 'title' => 'Maps',
                 'lat' => $lat,
                 'long' => $long,
-                'data_user' => User::findOrFail($userid)
-            ]);
-        } else {
-            return view('absen.mapsUser', [
-                'title' => 'Maps',
-                'lat' => $lat,
-                'long' => $long,
-                'data_user' => User::findOrFail($userid)
+                'data_user' => User::query()->findOrFail($userid)
             ]);
         }
+
+        return view('absen.mapsUser', [
+            'title' => 'Maps',
+            'lat' => $lat,
+            'long' => $long,
+            'data_user' => User::query()->findOrFail($userid)
+        ]);
     }
 
     public function editMasuk($id)
     {
-        $mapping_shift = MappingShift::findOrFail($id);
-        $user = User::findOrFail($mapping_shift->user_id);
+        $mapping_shift = MappingShift::query()->findOrFail($id);
+        $user = User::query()->findOrFail($mapping_shift->user_id);
         $lokasi = $user->Lokasi;
         return view('absen.editmasuk', [
             'title' => 'Edit Absen Masuk',
@@ -292,7 +323,7 @@ class AbsenController extends Controller
     {
         date_default_timezone_set('Asia/Jakarta');
 
-        $mapping_shift = MappingShift::where('id', $id)->get();
+        $mapping_shift = MappingShift::query()->where('id', $id)->get();
 
         foreach ($mapping_shift as $mp) {
             $shift = $mp->Shift->jam_masuk;
@@ -310,7 +341,7 @@ class AbsenController extends Controller
             $request["telat"] = $diff;
         }
 
-        $user = User::findOrFail($user_id);
+        $user = User::query()->findOrFail($user_id);
         $lat_kantor = $user->Lokasi->lat_kantor;
         $long_kantor = $user->Lokasi->long_kantor;
 
@@ -333,14 +364,14 @@ class AbsenController extends Controller
             $validatedData['foto_jam_absen'] = $request->file('foto_jam_absen')->store('foto_jam_absen', 'public');
         }
 
-        MappingShift::where('id', $id)->update($validatedData);
+        MappingShift::query()->where('id', $id)->update($validatedData);
         return redirect('/data-absen')->with('success', 'Berhasil Edit Absen Masuk (Manual)');
     }
 
     public function editPulang($id)
     {
-        $mapping_shift = MappingShift::findOrFail($id);
-        $user = User::findOrFail($mapping_shift->user_id);
+        $mapping_shift = MappingShift::query()->findOrFail($id);
+        $user = User::query()->findOrFail($mapping_shift->user_id);
         $lokasi = $user->Lokasi;
         return view('absen.editpulang', [
             'title' => 'Edit Absen Pulang',
@@ -351,7 +382,7 @@ class AbsenController extends Controller
 
     public function prosesEditPulang(Request $request, $id)
     {
-        $mapping_shift = MappingShift::where('id', $id)->get();
+        $mapping_shift = MappingShift::query()->where('id', $id)->get();
         foreach ($mapping_shift as $mp) {
             $shiftmasuk = $mp->Shift->jam_masuk;
             $shiftpulang = $mp->Shift->jam_keluar;
@@ -379,7 +410,7 @@ class AbsenController extends Controller
             $request["pulang_cepat"] = $diff;
         }
 
-        $user = User::findOrFail($user_id);
+        $user = User::query()->findOrFail($user_id);
         $lat_kantor = $user->Lokasi->lat_kantor;
         $long_kantor = $user->Lokasi->long_kantor;
 
@@ -401,14 +432,14 @@ class AbsenController extends Controller
             $validatedData['foto_jam_pulang'] = $request->file('foto_jam_pulang')->store('foto_jam_pulang', 'public');
         }
 
-        MappingShift::where('id', $id)->update($validatedData);
+        MappingShift::query()->where('id', $id)->update($validatedData);
 
         return redirect('/data-absen')->with('success', 'Berhasil Edit Absen Pulang (Manual)');
     }
 
     public function deleteAdmin($id)
     {
-        $delete = MappingShift::find($id);
+        $delete = MappingShift::query()->find($id);
         Storage::delete($delete->foto_jam_absen);
         Storage::delete($delete->foto_jam_pulang);
         $delete->delete();
@@ -419,21 +450,21 @@ class AbsenController extends Controller
     {
         date_default_timezone_set('Asia/Jakarta');
         $tglskrg = date('Y-m-d');
-        $data_absen = MappingShift::where('tanggal', $tglskrg)->where('user_id', auth()->user()->id);
+        $data_absen = MappingShift::query()->where('tanggal', $tglskrg)->where('user_id', auth()->user()->id);
 
-        if($request["mulai"] == null) {
+        if($request["mulai"] === null) {
             $request["mulai"] = $request["akhir"];
         }
 
-        if($request["akhir"] == null) {
+        if($request["akhir"] === null) {
             $request["akhir"] = $request["mulai"];
         }
 
         if ($request["mulai"] && $request["akhir"]) {
-            $data_absen = MappingShift::where('user_id', auth()->user()->id)->whereBetween('tanggal', [$request["mulai"], $request["akhir"]]);
+            $data_absen = MappingShift::query()->where('user_id', auth()->user()->id)->whereBetween('tanggal', [$request["mulai"], $request["akhir"]]);
         }
 
-        if (auth()->user()->is_admin == 'admin') {
+        if (auth()->user()->is_admin === 'admin') {
             return view('absen.myabsen', [
                 'title' => 'History Absen Karyawan',
                 'data_absen' => $data_absen->paginate(10000000)->withQueryString()
@@ -448,7 +479,7 @@ class AbsenController extends Controller
 
     public function pengajuan($id)
     {
-        $ms = MappingShift::find($id);
+        $ms = MappingShift::query()->find($id);
         $title = 'Pengajuan Absensi';
         return view('absen.pengajuan', compact(
             'ms',
@@ -458,7 +489,7 @@ class AbsenController extends Controller
 
     public function pengajuanProses(Request $request, $id)
     {
-        $ms = MappingShift::find($id);
+        $ms = MappingShift::query()->find($id);
         $validated = $request->validate([
             'jam_masuk_pengajuan' => 'required',
             'jam_pulang_pengajuan' => 'required',
@@ -473,8 +504,8 @@ class AbsenController extends Controller
 
         $ms->update($validated);
 
-        $jabatan = Jabatan::find(auth()->user()->jabatan_id);
-        $user = User::find($jabatan->manager);
+        $jabatan = Jabatan::query()->find(auth()->user()->jabatan_id);
+        $user = User::query()->find($jabatan->manager);
 
         $type = 'Approval';
         $notif = 'Pengajuan Absensi Dari ' . auth()->user()->name . ' Butuh Approval Anda';
@@ -497,10 +528,11 @@ class AbsenController extends Controller
     {
         $title = 'Pengajuan Absensi';
         $search = request()->input('search');
-        $jabatan = Jabatan::find(auth()->user()->jabatan_id);
-        $user_id = User::where('jabatan_id', auth()->user()->jabatan_id)->pluck('id');
-        $mapping_shift = MappingShift::where('status_pengajuan', '!=', null)
-                                    ->when($jabatan->manager == auth()->user()->id, function ($query) use ($user_id) {
+        $jabatan = Jabatan::query()->find(auth()->user()->jabatan_id);
+        $user_id = User::query()->where('jabatan_id', auth()->user()->jabatan_id)->pluck('id');
+        $mapping_shift = MappingShift::query()
+                                    ->where('status_pengajuan', '!=', null)
+                                    ->when($jabatan->manager === auth()->user()->id, function ($query) use ($user_id) {
                                         $query->where(function ($q) use ($user_id) {
                                             $q->whereIn('user_id', $user_id)
                                                 ->orWhere('user_id', auth()->user()->id);
@@ -526,8 +558,8 @@ class AbsenController extends Controller
 
     public function editPengajuanAbsensi($id)
     {
-        $ms = MappingShift::find($id);
-        $jabatan = Jabatan::find(auth()->user()->jabatan_id);
+        $ms = MappingShift::query()->find($id);
+        $jabatan = Jabatan::query()->find(auth()->user()->jabatan_id);
         $title = 'Pengajuan Absensi';
         return view('absen.editPengajuan', compact(
             'ms',
@@ -538,7 +570,7 @@ class AbsenController extends Controller
 
     public function updatePengajuanAbsensi(Request $request, $id)
     {
-        $ms = MappingShift::find($id);
+        $ms = MappingShift::query()->find($id);
         $validated = $request->validate([
             'jam_masuk_pengajuan' => 'required',
             'jam_pulang_pengajuan' => 'required',
@@ -550,7 +582,7 @@ class AbsenController extends Controller
 
         $ms->update($validated);
 
-        if ($request['status_pengajuan'] == 'Disetujui') {
+        if ($request['status_pengajuan'] === 'Disetujui') {
             $shiftmasuk = $ms->Shift->jam_masuk;
             $tanggal = $ms->tanggal;
 
@@ -599,7 +631,7 @@ class AbsenController extends Controller
                 'status_absen' => 'Masuk',
             ]);
 
-            $user = User::find($ms->user_id);
+            $user = User::query()->find($ms->user_id);
 
             $type = 'Approved';
             $notif = 'Pengajuan Absensi Anda Telah Di Setujui Oleh ' . auth()->user()->name;
@@ -614,7 +646,7 @@ class AbsenController extends Controller
             $user->notify(new \App\Notifications\UserNotification);
 
             NotifApproval::dispatch($type, $user->id, $notif, $url);
-        } else if ($request['status_pengajuan'] == 'Tidak Disejutui') {
+        } else if ($request['status_pengajuan'] === 'Tidak Disejutui') {
             $user = User::find($ms->user_id);
 
             $type = 'Rejected';
@@ -631,8 +663,8 @@ class AbsenController extends Controller
 
             NotifApproval::dispatch($type, $user->id, $notif, $url);
         } else {
-            $jabatan = Jabatan::find(auth()->user()->jabatan_id);
-            $user = User::find($jabatan->manager);
+            $jabatan = Jabatan::query()->find(auth()->user()->jabatan_id);
+            $user = User::query()->find($jabatan->manager);
 
             $type = 'Approval';
             $notif = 'Pengajuan Absensi Dari ' . auth()->user()->name . ' Butuh Approval Anda';

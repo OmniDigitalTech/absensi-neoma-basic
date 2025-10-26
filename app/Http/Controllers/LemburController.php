@@ -32,7 +32,7 @@ class LemburController extends Controller
         $tanggal = "";
         $tglskrg = date("Y-m-d");
         $tglkmrn = date('Y-m-d', strtotime('-1 days'));
-        $lembur = Lembur::where('user_id', $user_login)->where('tanggal', $tglkmrn)->get();
+        $lembur = Lembur::query()->where('user_id', $user_login)->where('tanggal', $tglkmrn)->get();
         if($lembur->count() > 0) {
             foreach($lembur as $l) {
                 $jam_keluar = $l->jam_keluar;
@@ -40,23 +40,23 @@ class LemburController extends Controller
         } else {
             $jam_keluar = "-";
         }
-        if($jam_keluar == null){
+        if($jam_keluar === null){
             $tanggal = $tglkmrn;
         } else {
             $tanggal = $tglskrg;
         }
 
-        if (auth()->user()->is_admin == 'admin') {
+        if (auth()->user()->is_admin === 'admin') {
             return view('lembur.index', [
-                'title' => 'Absen Lembur',
-                'lembur' => Lembur::where('user_id', $user_login)->where('tanggal', $tanggal)->get()
-            ]);
-        } else {
-            return view('lembur.indexuser', [
-                'title' => 'Lembur',
-                'lembur' => Lembur::where('user_id', $user_login)->where('tanggal', $tanggal)->first()
+                'title' => 'Absen Lembur Admin',
+                'lembur' => Lembur::query()->where('user_id', $user_login)->where('tanggal', $tanggal)->get()
             ]);
         }
+
+        return view('lembur.indexUser', [
+            'title' => 'Absen Lembur Karyawan',
+            'lembur' => Lembur::query()->where('user_id', $user_login)->where('tanggal', $tanggal)->first()
+        ]);
 
     }
 
@@ -69,9 +69,9 @@ class LemburController extends Controller
         $miles = $dist * 60 * 1.1515;
         $unit = strtoupper($unit);
 
-        if ($unit == "K") {
+        if ($unit === "K") {
             return ($miles * 1.609344);
-        } else if ($unit == "N") {
+        } else if ($unit === "N") {
             return ($miles * 0.8684);
         } else {
             return $miles;
@@ -91,14 +91,13 @@ class LemburController extends Controller
 
         if($request["jarak_masuk"] > $radius) {
             Alert::error('Diluar Jangkauan', 'Lokasi Anda Diluar Radius ' . $nama_lokasi);
-            return redirect('/lembur');
         } else {
             $foto_jam_masuk = $request["foto_jam_masuk"];
 
             $image_parts = explode(";base64,", $foto_jam_masuk);
 
             $image_base64 = base64_decode($image_parts[1]);
-            $fileName = 'foto_jam_masuk_lembur/' . uniqid() . '.png';
+            $fileName = 'foto_jam_masuk_lembur/' . uniqid('', true) . '.png';
 
             Storage::disk('public')->put($fileName, $image_base64);
 
@@ -116,12 +115,12 @@ class LemburController extends Controller
                 'status' => 'required'
             ]);
 
-            Lembur::create($validatedData);
+            Lembur::query()->create($validatedData);
 
             $request->session()->flash('success', 'Berhasil Masuk Lembur');
 
-            return redirect('/lembur');
         }
+        return redirect('/lembur');
 
     }
 
@@ -145,7 +144,7 @@ class LemburController extends Controller
             $image_parts = explode(";base64,", $foto_jam_keluar);
 
             $image_base64 = base64_decode($image_parts[1]);
-            $fileName = 'foto_jam_keluar_lembur/' . uniqid() . '.png';
+            $fileName = 'foto_jam_keluar_lembur/' . uniqid('', true) . '.png';
 
             Storage::disk('public')->put($fileName, $image_base64);
 
@@ -177,8 +176,8 @@ class LemburController extends Controller
                 ->where("id", auth()->user()->id)->first();
 
             // Fetch users to notify (admin and head) based on requested lembur user
-            $requestedUser = User::findOrFail($lembur->user_id);
-            $users = User::where('is_admin', 'admin')
+            $requestedUser = User::query()->findOrFail($lembur->user_id);
+            $users = User::query()->where('is_admin', 'admin')
                 ->orWhere(function ($query) use ($requestedUser) {
                     $query->where('id', function ($subQuery) use ($requestedUser) {
                         $subQuery->select('manager')

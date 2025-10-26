@@ -82,13 +82,14 @@
             <input type="hidden" name="lat" id="lat2">
             <input type="hidden" name="long" id="long2">
             <input type="hidden" name="userid" value="{{ auth()->user()->id }}">
+            <input type="hidden" name="page" value="lembur">
             <button type="submit" class="btn btn-success">Lihat Lokasi Saya</button>
         </form>
     </div>
 
     <br>
 
-    @if($cek_lembur == 0)
+    @if($cek_lembur === 0)
     <div class="col-lg-12">
         <div class="card">
             <form method="post" action="{{ url('/lembur/masuk') }}" class="p-4">
@@ -96,12 +97,12 @@
                 <div class="form-row">
                     <div class="col"></div>
                     <div class="col">
-                        <center>
+                        <div style="text-align: center;">
                             <h2>Masuk Lembur: </h2>
                             <div class="webcam" id="results"></div>
                             <div class="form-group">
                                 <label for="keterangan">
-                                    <h6>Mengerjakaan</h6>
+                                    <h6>Mengerjakan</h6>
                                 </label>
                                 <textarea type="text" class="form-control @error('keterangan') is-invalid @enderror"
                                     id="keterangan" name="keterangan">{{ old('keterangan') }}</textarea>
@@ -111,7 +112,7 @@
                                 </div>
                                 @enderror
                             </div>
-                        </center>
+                        </div>
                     </div>
                     <div class="col">
                         <input type="hidden" name="user_id" value="{{ auth()->user()->id }}">
@@ -124,10 +125,10 @@
                         <input type="hidden" name="foto_jam_masuk" class="image-tag">
                     </div>
                 </div>
-                <center>
+                <div style="text-align: center;">
                     <button type="submit" class="btn btn-primary" value="Ambil Foto"
                         onClick="take_snapshot()">Masuk</button>
-                </center>
+                </div>
             </form>
         </div>
     </div>
