@@ -78,6 +78,7 @@
             <input type="hidden" name="lat" id="lat2">
             <input type="hidden" name="long" id="long2">
             <input type="hidden" name="userid" value="{{ auth()->user()->id }}">
+            <input type="hidden" name="page" value="oncall">
             <button type="submit" class="btn btn-success">Lihat Lokasi Saya</button>
         </form>
     </div>

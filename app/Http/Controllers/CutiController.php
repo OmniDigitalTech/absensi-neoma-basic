@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use App\Exceptions\CustomException;
 use App\Mail\ApprovalCutiMail;
 use App\Models\Cuti;
+use App\Models\DataCuti;
 use App\Models\Jabatan;
 use App\Models\settings;
 use App\Models\Shift;
 use App\Models\User;
 use App\Models\MappingShift;
 use App\Services\EmailService;
+use App\Services\KaryawanService;
 use App\Services\NotifyService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -24,56 +26,81 @@ class CutiController extends Controller
 {
     protected $notifyService;
     protected $emailService;
+    protected $cutiService;
 
-    public function __construct(NotifyService $notifyService, EmailService $emailService)
+    public function __construct(NotifyService $notifyService, EmailService $emailService, KaryawanService $cutiService)
     {
         $this->notifyService = $notifyService;
         $this->emailService = $emailService;
+        $this->cutiService = $cutiService;
     }
 
     public function index()
     {
         $user_id = auth()->user()->id;
-        $user = User::findOrFail(auth()->user()->id);
+        $user = User::query()->findOrFail(auth()->user()->id);
 
         $mulai = request()->input('mulai');
         $akhir = request()->input('akhir');
 
-        $cuti = Cuti::where('user_id', $user_id)
+        $cutiUser = Cuti::query()->where('user_id', $user_id)
                     ->when($mulai && $akhir, function ($query) use ($mulai, $akhir) {
                         return $query->where('tanggal_mulai','=',$mulai)->where('tanggal_akhir','=',$akhir);
                     })
                     ->orderBy('id', 'desc')->paginate(5)->withQueryString();
 
-        if (auth()->user()->is_admin == 'admin') {
+        $dataCuti = DataCuti::query()->get()->all();
+
+        // bikin array baru dengan pengurangan izin yang sudah diambil
+
+        if (auth()->user()->is_admin === 'admin') {
             return view('cuti.datacuti', [
                 'title' => 'Tambah Permintaan Cuti Karyawan',
                 'data_user' => $user,
-                'data_cuti' => $cuti
-            ]);
-        } else {
-            return view('cuti.indexuser', [
-                'title' => 'Tambah Permintaan Cuti Karyawan',
-                'data_user' => $user,
-                'data_cuti_user' => $cuti
+                'data_cuti_user' => $cutiUser,
+                'data_cuti' => $dataCuti
             ]);
         }
+
+        return view('cuti.indexuser ', [
+            'title' => 'Tambah Permintaan Cuti Karyawan',
+            'data_user' => $user,
+            'data_cuti_user' => $cutiUser,
+            'data_cuti' => $dataCuti
+        ]);
     }
 
     public function tambah(Request $request)
     {
         date_default_timezone_set('Asia/Jakarta');
 
-        if($request["tanggal_mulai"] == null) {
-            $request["tanggal_mulai"] = $request["tanggal_akhir"];
-        } else {
-            $request["tanggal_mulai"] = $request["tanggal_mulai"];
+        $userId = $request['user_id'];
+        $tglMulai = $request['tanggal_mulai'];
+        $tglAkhir = $request['tanggal_akhir'];
+
+        $isAvailable = $this->cutiService->isCutiIzinScheduleAvailable($userId, $tglMulai, $tglAkhir);
+
+        if (!$isAvailable) {
+            Alert::error('Peringatan!', 'Tanggal "'.$tglMulai.' sampai '.$tglAkhir.'" sudah ada ajuan Cuti/Izin');
+            return redirect('/cuti');
         }
 
-        if($request["tanggal_akhir"] == null) {
+        $request->validate([
+            'user_id' => 'required',
+            'nama_cuti' => 'required',
+            'tanggal_mulai' => 'required',
+            'tanggal_akhir' => 'required',
+            'alasan_cuti' => 'required',
+            'foto_cuti' => 'required|image|file|max:10240',
+            'status_cuti' => 'required',
+        ]);
+
+        if($request["tanggal_mulai"] === null) {
+            $request["tanggal_mulai"] = $request["tanggal_akhir"];
+        }
+
+        if($request["tanggal_akhir"] === null) {
             $request["tanggal_akhir"] = $request["tanggal_mulai"];
-        } else {
-            $request["tanggal_akhir"] = $request["tanggal_akhir"];
         }
 
         // $begin = new \DateTime($request["tanggal_mulai"]);
@@ -88,7 +115,7 @@ class CutiController extends Controller
 
             $request['status_cuti'] = "Pending";
 
-            if (auth()->user()->is_admin == 'director') {
+            if (auth()->user()->is_admin === 'director') {
                 $request['status_cuti'] = "Diterima";
             }
 
@@ -106,26 +133,30 @@ class CutiController extends Controller
                 $validatedData['foto_cuti'] = $request->file('foto_cuti')->store('foto_cuti', 'public');
             }
 
-            Cuti::create($validatedData);
+            Cuti::query()->create($validatedData);
 
             // get the cuti data and who is the requester
-            $checkUserRole = User::findOrFail($request['user_id'], ['is_admin']);
+            $checkUserRole = User::query()->findOrFail($request['user_id'], ['is_admin']);
 
             // check user is director to auto accepted
-            if ($checkUserRole->is_admin == 'director') {
+            if ($checkUserRole && $checkUserRole->is_admin === 'director') {
                 // Create a new Request instance and set the necessary data
                 $requestDirector = new Request([
                     'action' => 'Diterima',
                     'approval_type' => 'Diterima'
                 ]);
-                $requestedCutiUser = Cuti::where("user_id", $request['user_id'])->first()->id;
+                $requestedCutiUser = Cuti::query()->where("user_id", $request['user_id'])->first()->id;
 
-                $this->actionApproval($requestDirector, $requestedCutiUser);
+                try {
+                    $this->actionApproval($requestDirector, $requestedCutiUser);
+                } catch (CustomException $e) {
+                    throw new HttpException(500, $e->getMessage());
+                }
             }
 //         }
 
-        $requestedUser = User::findOrFail($request['user_id']);
-        $users = User::where('is_admin', 'admin')
+        $requestedUser = User::query()->findOrFail($request['user_id']);
+        $users = User::query()->where('is_admin', 'admin')
             ->orWhere(function ($query) use ($requestedUser) {
                 $query->where('id', function ($subQuery) use ($requestedUser) {
                     $subQuery->select('manager')
@@ -136,7 +167,7 @@ class CutiController extends Controller
 
         foreach ($users as $user) {
             $type = 'Approval';
-            if ($user->is_admin == 'admin') {
+            if ($user->is_admin === 'admin') {
                 $notif = 'Ada pengajuan Cuti Dari ' . auth()->user()->name;
                 $url = url('/data-cuti?user_id='.$request["user_id"].'&mulai='.$request["tanggal_mulai"].'&akhir='.$request["tanggal_akhir"]);
                 $action = '/data-cuti?user_id='.$request["user_id"].'&mulai='.$request["tanggal_mulai"].'&akhir='.$request["tanggal_akhir"];
@@ -170,17 +201,17 @@ class CutiController extends Controller
     }
 
     public function edit($id){
-        if (auth()->user()->is_admin == 'admin') {
+        if (auth()->user()->is_admin === 'admin') {
             return view('cuti.edit', [
                 'title' => 'Edit Permintaan Cuti',
                 'data_cuti_user' => Cuti::findOrFail($id)
             ]);
-        } else {
-            return view('cuti.edituser', [
-                'title' => 'Edit Permintaan Cuti',
-                'data_cuti_user' => Cuti::findOrFail($id)
-            ]);
         }
+
+        return view('cuti.edituser', [
+            'title' => 'Edit Permintaan Cuti',
+            'data_cuti_user' => Cuti::findOrFail($id)
+        ]);
 
     }
 

@@ -1,7 +1,7 @@
 <div class="col mb-4">
     <h3 style="color: blue">Pengurangan Gaji</h3>
 </div>
-@if(isset($data_deduksi, $data_bpjs_kesehatan, $data_bpjs_ketenagakerjaan, $data_bpjs_ketenagakerjaan_jkk))
+@if(!empty($data_deduksi) || !empty($data_bpjs_kesehatan) || !empty($data_bpjs_ketenagakerjaan) || !empty($data_bpjs_ketenagakerjaan_jkk))
     <div class="col mb-4">
         <h5 style="color: blue">UMUM</h5>
     </div>

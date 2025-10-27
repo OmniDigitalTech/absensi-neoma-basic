@@ -22,10 +22,10 @@
 <?php $lock_location = null ?>
 @endif
 <div class="container-fluid">
-    <center>
+    <div style="text-align: center;">
         <p class="p mb-2 text-gray-800">Tanggal Shift : {{ $sktanggal }}</p>
         <p class="p mb-2 text-gray-800">Shift : {{ $sknamas}} ({{ $skjamas }} - {{  $skjamkel }})</p>
-    </center>
+    </div>
 
     <style>
     .jam-digital-malasngoding {
@@ -86,6 +86,7 @@
             <input type="hidden" name="lat" id="lat2">
             <input type="hidden" name="long" id="long2">
             <input type="hidden" name="userid" value="{{ auth()->user()->id }}">
+            <input type="hidden" name="page" value="absen">
             <button type="submit" class="btn btn-success">Lihat Lokasi Saya</button>
         </form>
     </div>
@@ -101,7 +102,7 @@
             </div>
         </div>
     </div>
-    @elseif($skstatus == "Libur")
+    @elseif($skstatus === "Libur")
     <br>
     <div class="col-lg-12">
         <div class="card">
@@ -112,19 +113,19 @@
             </div>
         </div>
     </div>
-    @elseif($skstatus == "Cuti")
+    @elseif($skstatus === "Cuti")
     <br>
     <div class="col-lg-12">
         <div class="card">
             <div class="p-4">
-                <center>
+                <div style="text-align: center;">
                     <h2>Hari Ini Anda Cuti</h2>
-                </center>
+                </div>
             </div>
         </div>
     </div>
     @else
-    @if($skjamab == null)
+    @if($skjamab === null)
     <br>
     <div class="col-lg-12">
         <div class="card">
@@ -134,10 +135,10 @@
                 <div class="form-row">
                     <div class="col"></div>
                     <div class="col">
-                        <center>
+                        <div style="text-align: center;">
                             <h2>Absen Masuk: </h2>
                             <div class="webcam" id="results"></div>
-                            @if ($lock_location == null)
+                            @if ($lock_location === null)
                             <div class="form-group">
                                 <label for="keterangan_masuk">Keterangan Masuk</label>
                                 <textarea type="text"
@@ -151,7 +152,7 @@
                                 @enderror
                             </div>
                             @endif
-                        </center>
+                        </div>
                     </div>
                     <div class="col">
                         <input type="hidden" name="jam_absen">
@@ -163,10 +164,10 @@
                         <input type="hidden" name="status_absen">
                     </div>
                 </div>
-                <center>
+                <div style="text-align: center;">
                     <button type="submit" class="btn btn-primary" value="Ambil Foto"
                         onClick="take_snapshot()">Masuk</button>
-                </center>
+                </div>
             </form>
         </div>
     </div>
@@ -188,12 +189,12 @@
             $(".image-tag").val(data_uri);
             // display results in page
             document.getElementById('results').innerHTML =
-                '<img src="' + data_uri + '"/>';
+                '<img src="' + data_uri + '" alt=""/>';
         });
     }
     </script>
 
-    @elseif($skjampul == null)
+    @elseif($skjampul === null)
     <br>
     <div class="col-lg-12">
         <div class="card">
@@ -203,10 +204,10 @@
                 <div class="form-row">
                     <div class="col"></div>
                     <div class="col">
-                        <center>
+                        <div style="text-align: center;">
                             <h2>Absen Pulang: </h2>
                             <div class="webcam" id="results"></div>
-                            @if ($lock_location == null)
+                            @if ($lock_location === null)
                             <div class="form-group">
                                 <label for="keterangan_pulang">keterangan Pulang</label>
                                 <textarea type="text"
@@ -220,7 +221,7 @@
                                 @enderror
                             </div>
                             @endif
-                        </center>
+                        </div>
                     </div>
                     <div class="col">
                         <input type="hidden" name="jam_pulang">
@@ -255,8 +256,8 @@
         Webcam.snap(function(data_uri) {
             $(".image-tag").val(data_uri);
             // display results in page
-            document.getElementById('results').innerHTML =
-                '<img src="' + data_uri + '"/>';
+            document.getElementById('results').inner HTML =
+                '<img src="' + data_uri + '" alt=""/>';
         });
     }
     </script>
@@ -265,9 +266,9 @@
     <div class="col-lg-12">
         <div class="card">
             <div class="p-4">
-                <center>
+                <div style="text-align: center;">
                     <h2>Anda Sudah Selesai Absen</h2>
-                </center>
+                </div>
             </div>
         </div>
     </div>

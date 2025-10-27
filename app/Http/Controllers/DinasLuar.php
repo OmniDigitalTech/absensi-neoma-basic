@@ -16,7 +16,7 @@ class DinasLuar extends Controller
         $tanggal = "";
         $tglskrg = date('Y-m-d');
         $tglkmrn = date('Y-m-d', strtotime('-1 days'));
-        $dinas_luar = ModelsDinasLuar::where('user_id', $user_login)->where('tanggal', $tglkmrn)->get();
+        $dinas_luar = ModelsDinasLuar::query()->where('user_id', $user_login)->where('tanggal', $tglkmrn)->get();
         if($dinas_luar->count() > 0) {
             foreach($dinas_luar as $mp) {
                 $jam_absen = $mp->jam_absen;
@@ -26,61 +26,61 @@ class DinasLuar extends Controller
             $jam_absen = "-";
             $jam_pulang = "-";
         }
-        if($jam_absen != null && $jam_pulang == null) {
+        if($jam_absen !== null && $jam_pulang === null) {
             $tanggal = $tglkmrn;
         } else {
             $tanggal = $tglskrg;
         }
-        if (auth()->user()->is_admin == 'admin') {
+        if (auth()->user()->is_admin === 'admin') {
             return view('dinasluar.index', [
-                'title' => 'Absen',
-                'dinas_luar' => ModelsDinasLuar::where('user_id', $user_login)->where('tanggal', $tanggal)->get()
-            ]);
-        } else {
-            return view('dinasluar.indexuser', [
-                'title' => 'Absen Dinas Luar',
-                'dinas_luar' => ModelsDinasLuar::where('user_id', $user_login)->where('tanggal', $tanggal)->first()
+                'title' => 'Absen Dinas Luar Admin',
+                'dinas_luar' => ModelsDinasLuar::query()->where('user_id', $user_login)->where('tanggal', $tanggal)->get()
             ]);
         }
+
+        return view('dinasluar.indexUser', [
+            'title' => 'Absen Dinas Luar Karyawan',
+            'dinas_luar' => ModelsDinasLuar::query()->where('user_id', $user_login)->where('tanggal', $tanggal)->first()
+        ]);
     }
     public function absenMasukDinas(Request $request, $id)
     {
         date_default_timezone_set('Asia/Jakarta');
         $request["jam_absen"] = date('H:i');
-        
+
             $foto_jam_absen = $request["foto_jam_absen"];
 
             $image_parts = explode(";base64,", $foto_jam_absen);
-    
+
             $image_base64 = base64_decode($image_parts[1]);
-            $fileName = 'foto_dinas_luar_masuk/' . uniqid() . '.png';
-    
+            $fileName = 'foto_dinas_luar_masuk/' . uniqid('', true) . '.png';
+
             Storage::disk('public')->put($fileName, $image_base64);
-    
-    
+
+
             $request["foto_jam_absen"] = $fileName;
-    
+
             $request["status_absen"] = "Masuk";
-    
+
             $dinas_luar = ModelsDinasLuar::where('id', $id)->get();
-    
+
             foreach ($dinas_luar as $dl) {
                 $shift = $dl->Shift->jam_masuk;
                 $tanggal = $dl->tanggal;
             }
-    
+
             $tgl_skrg = date("Y-m-d");
-    
+
             $awal  = strtotime($tanggal . $shift);
             $akhir = strtotime($tgl_skrg . $request["jam_absen"]);
             $diff  = $akhir - $awal;
-    
+
             if ($diff <= 0) {
                 $request["telat"] = 0;
             } else {
                 $request["telat"] = $diff;
             }
- 
+
             $validatedData = $request->validate([
                 'jam_absen' => 'required',
                 'telat' => 'nullable',
@@ -89,11 +89,11 @@ class DinasLuar extends Controller
                 'foto_jam_absen' => 'required',
                 'status_absen' => 'required'
             ]);
-    
+
             ModelsDinasLuar::where('id', $id)->update($validatedData);
-    
+
             $request->session()->flash('success', 'Berhasil Absen Masuk');
-    
+
             return redirect('/dinas-luar');
     }
 
@@ -101,18 +101,18 @@ class DinasLuar extends Controller
     {
         date_default_timezone_set('Asia/Jakarta');
         $request["jam_pulang"] = date('H:i');
-        
+
             $foto_jam_pulang = $request["foto_jam_pulang"];
 
             $image_parts = explode(";base64,", $foto_jam_pulang);
-    
+
             $image_base64 = base64_decode($image_parts[1]);
             $fileName = 'foto_dinas_luar_pulang/' . uniqid() . '.png';
-    
+
             Storage::disk('public')->put($fileName, $image_base64);
-    
+
             $request["foto_jam_pulang"] = $fileName;
-    
+
             $dinas_luar = ModelsDinasLuar::where('id', $id)->get();
             foreach ($dinas_luar as $dl) {
                 $shiftmasuk = $dl->Shift->jam_masuk;
@@ -122,20 +122,20 @@ class DinasLuar extends Controller
             $new_tanggal = "";
             $timeMasuk = strtotime($shiftmasuk);
             $timePulang = strtotime($shiftpulang);
-    
-    
+
+
             if ($timePulang < $timeMasuk) {
                 $new_tanggal = date('Y-m-d', strtotime('+1 days', strtotime($tanggal)));
             } else {
                 $new_tanggal = $tanggal;
             }
-    
+
             $tgl_skrg = date("Y-m-d");
-    
+
             $akhir = strtotime($new_tanggal . $shiftpulang);
             $awal  = strtotime($tgl_skrg . $request["jam_pulang"]);
             $diff  = $akhir - $awal;
-    
+
             if ($diff <= 0) {
                 $request["pulang_cepat"] = 0;
             } else {
@@ -149,9 +149,9 @@ class DinasLuar extends Controller
                 'long_pulang' => 'required',
                 'pulang_cepat' => 'required',
             ]);
-    
+
             ModelsDinasLuar::where('id', $id)->update($validatedData);
-    
+
             return redirect('/dinas-luar')->with('success', 'Berhasil Absen Pulang');
     }
 

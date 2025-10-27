@@ -18,7 +18,7 @@
             </div>
         </div>
     </div>
-    
+
     <br>
     <style>
         .jam-digital-malasngoding {
@@ -75,6 +75,7 @@
             <input type="hidden" name="lat" id="lat2">
             <input type="hidden" name="long" id="long2">
             <input type="hidden" name="userid" value="{{ auth()->user()->id }}">
+            <input type="hidden" name="page" value="dinas-luar">
             <button type="submit" class="btn btn-success">Lihat Lokasi Saya</button>
         </form>
     </div>
@@ -84,16 +85,16 @@
             <center>
                 <h2>Hubungi Admin Untuk Input Shift Anda</h2>
             </center>
-        @elseif($dinas_luar->status_absen == 'Libur')
+        @elseif($dinas_luar->status_absen === 'Libur')
             <center>
                 <h2>Hari Ini Anda Libur</h2>
             </center>
-        @elseif($dinas_luar->status_absen == "Cuti")
+        @elseif($dinas_luar->status_absen === "Cuti")
             <center>
                 <h2>Hari Ini Anda Cuti</h2>
             </center>
         @else
-            @if ($dinas_luar->jam_absen == null)
+            @if ($dinas_luar->jam_absen === null)
                 <form method="post" action="{{ url('/dinas-luar/masuk/'.$dinas_luar->id) }}">
                     @method('PUT')
                     @csrf
@@ -203,5 +204,5 @@
             setInterval(getLocation, 1000);
         </script>
     @endpush
-    
+
 @endsection
