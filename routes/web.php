@@ -312,7 +312,13 @@ Route::get('/data-absen/export', [AbsenController::class, 'exportDataAbsen'])->m
 Route::get('/settings', [SettingsController::class, 'index'])->middleware('admin');
 Route::post('/settings/store', [SettingsController::class, 'store'])->middleware('admin');
 
-Route::get('/reset', function () {
+Route::get('/scheduler-trigger/rE3a1Hjq4hMpUlblhqrBc8hQOEQ719iKQJ5AMi9HFpbQCDWHU407cqB2SXX6oSOf', static function () {
+    Artisan::call('schedule:run');
+
+    return 'Scheduler executed!';
+});
+
+Route::get('/reset', static function () {
     Artisan::call('optimize');
     Artisan::call('config:cache');
     Artisan::call('route:clear');

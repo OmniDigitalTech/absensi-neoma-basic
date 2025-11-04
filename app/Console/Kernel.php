@@ -21,7 +21,7 @@ class Kernel extends ConsoleKernel
     /**
      * Define the application's command schedule.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
+     * @param Schedule $schedule
      * @return void
      */
     protected function schedule(Schedule $schedule)
@@ -70,23 +70,28 @@ class Kernel extends ConsoleKernel
                 // Schedule notification tasks for each timing point
                 // 1. Schedule for 10 minutes before `jam_masuk` (Shift Start)
                 $schedule->command('notify:absensi')
-                    ->dailyAt($tenMinutesBeforeStart->format('H:i'));
+                    ->dailyAt($tenMinutesBeforeStart->format('H:i'))
+                    ->timezone('Asia/Jakarta');;
 
                 // 2. Schedule for exact time of `jam_masuk` (Shift Start)
                 $schedule->command('notify:absensi')
-                    ->dailyAt($exactShiftStart->format('H:i'));
+                    ->dailyAt($exactShiftStart->format('H:i'))
+                    ->timezone('Asia/Jakarta');;
 
                 // 3. Schedule for 10 minutes before `jam_keluar` (Shift End)
                 $schedule->command('notify:absensi')
-                    ->dailyAt($tenMinutesBeforeEnd->format('H:i'));
+                    ->dailyAt($tenMinutesBeforeEnd->format('H:i'))
+                    ->timezone('Asia/Jakarta');;
 
                 // 4. Schedule for 5 minutes before `jam_keluar` (Shift End)
                 $schedule->command('notify:absensi')
-                    ->dailyAt($fiveMinutesBeforeEnd->format('H:i'));
+                    ->dailyAt($fiveMinutesBeforeEnd->format('H:i'))
+                    ->timezone('Asia/Jakarta');;
 
                 // 5. Schedule for exact time of `jam_keluar` (Shift End)
                 $schedule->command('notify:absensi')
-                    ->dailyAt($exactShiftEnd->format('H:i'));
+                    ->dailyAt($exactShiftEnd->format('H:i'))
+                    ->timezone('Asia/Jakarta');;
             } catch (\Exception $e) {
                 // Handle invalid times
                 Log::error("Invalid jam_keluar format for Shift ID {$shift->id}: " . $shift->jam_keluar);
@@ -100,7 +105,7 @@ class Kernel extends ConsoleKernel
      *
      * @return void
      */
-    protected function commands()
+    protected function commands(): void
     {
         $this->load(__DIR__.'/Commands');
 
