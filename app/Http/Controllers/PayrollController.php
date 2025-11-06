@@ -176,7 +176,9 @@ class PayrollController extends Controller
     }
     public function update(Request $request, $id)
     {
-        $payroll = Payroll::find($id);
+        dd($request->all());
+
+        $payroll = Payroll::query()->find($id);
         $validated = $request->validate([
             'user_id' => 'required',
             'bulan' => 'required',
@@ -208,7 +210,7 @@ class PayrollController extends Controller
             'jumlah_thr' => 'required',
             'uang_thr' => 'required',
             'total_thr' => 'required',
-            'loss' => 'required',
+            'loss' => 'sometimes',
             'total_penjumlahan' => 'required',
             'total_pengurangan' => 'required',
             'grand_total' => 'required',

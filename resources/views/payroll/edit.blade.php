@@ -184,7 +184,7 @@
                             <div class="card p-4">
                                 <label for="jumlah_kehadiran">100% Kehadiran</label>
                                 <div class="input-group mb-3">
-                                    <input type="number" class="form-control @error('jumlah_kehadiran') is-invalid @enderror" name="jumlah_kehadiran" value="{{ old('jumlah_kehadiran', $data->jumlah_kehadiran) }}" id="jumlah_kehadiran" style="background-color: orange" readonly>
+                                    <input type="number" class="form-control @error('jumlah_kehadiran') is-invalid @enderror" name="jumlah_kehadiran" value="{{ old('jumlah_kehadiran', $data->jumlah_kehadiran) }}" id="jumlah_kehadiran" style="background-color: orange" min="0">
                                     <div class="input-group-text">
                                         <span>/ Kali</span>
                                     </div>
@@ -450,13 +450,17 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col mb-4">
+                        <button class="btn form-control btn-secondary mt-3 mb-3" id="proses">Proses</button>
+                        <button type="submit" class="btn form-control btn-primary mt-3 mb-3" id="submit" disabled>Simpan</button>
+                    </div>
                     <div class="form-row">
                         <div class="col mb-4">
                             <div class="card p-4">
-                                <center>
+                                <div style="text-align: center;">
                                     <label style="color:green">TOTAL PENJUMLAHAN</label>
                                     <input type="text" class="form-control border-white text-center money @error('total_penjumlahan') is-invalid @enderror" id="total_penjumlahan" name="total_penjumlahan" value="{{ old('total_penjumlahan', $data->total_penjumlahan) }}" readonly style="background-color: white; color:black">
-                                </center>
+                                </div>
                             </div>
                         </div>
                         <div class="col mb-4">
@@ -468,14 +472,14 @@
                             </div>
                         </div>
                     </div>
-                    <center>
+                    <div style="text-align: center;">
                         <div class="col">
                             <div class="card p-4">
                                 <label style="color:blue">GRAND TOTAL</label>
                                 <input type="text" class="form-control border-white text-center money @error('grand_total') is-invalid @enderror" id="grand_total" name="grand_total" value="{{ old('grand_total', $data->grand_total) }}" readonly style="background-color: white; color:black">
                             </div>
                         </div>
-                    </center>
+                    </div>
                   </form>
             </div>
         </div>
@@ -553,7 +557,7 @@
                     // var bayar_kasbon = $('#bayar_kasbon').val() ? parseFloat(replaceCurrency($('#bayar_kasbon').val())) : 0;
                     // var loss = $('#loss').val() ? parseFloat(replaceCurrency($('#loss').val())) : 0;
 
-                    let bpjs_kesehatan = $('#bpjs_kesehatan').val() ? parseFloat(replaceCurrency($('#bpjs_kesehatan').val())) : 0;
+                    let bpjs_kesehatan = $('#potongan_bpjs_kesehatan').val() ? parseFloat(replaceCurrency($('#potongan_bpjs_kesehatan').val())) : 0;
 
                     let bpjs_ketenagakerjaan_jht = $('#potongan_Jaminan_Hari_Tua').val() ? parseFloat(replaceCurrency($('#potongan_Jaminan_Hari_Tua').val())) : 0;
                     let bpjs_ketenagakerjaan_jp = $('#potongan_Jaminan_Pensiun').val() ? parseFloat(replaceCurrency($('#potongan_Jaminan_Pensiun').val())) : 0;
