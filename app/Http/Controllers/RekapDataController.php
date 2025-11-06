@@ -12,6 +12,7 @@ use App\Models\Payroll;
 use App\Exports\RekapExport;
 use App\Models\MappingShift;
 use App\Services\KaryawanService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
@@ -81,6 +82,41 @@ class RekapDataController extends Controller
         });
     }
 
+    public function hitungMetrikKehadiran(User $user, string $mulai, string $akhir): array
+    {
+        $shiftsDalamRentang = $user->MappingShift()
+            ->whereBetween('tanggal', [$mulai, $akhir])
+            ->get();
+
+        $jumlah_hadir = $shiftsDalamRentang->where('status_absen', 'Masuk')->count();
+        $jumlah_izin_telat = $shiftsDalamRentang->where('status_absen', 'Izin Telat')->count();
+        $jumlah_izin_pulang_cepat = $shiftsDalamRentang->where('status_absen', 'Izin Pulang Cepat')->count();
+        $libur = $shiftsDalamRentang->where('status_absen', 'Libur')->count();
+
+        $carbonMulai = Carbon::parse($mulai);
+        $carbonAkhir = Carbon::parse($akhir);
+        $jumlah_hari = $carbonMulai->diffInDays($carbonAkhir) + 1;
+
+        $total_kehadiran_terhitung = $jumlah_hadir + $jumlah_izin_telat + $jumlah_izin_pulang_cepat + $libur;
+
+        $presentase_kehadiran = 0;
+        if ($jumlah_hari > 0) {
+            $presentase_kehadiran = ($total_kehadiran_terhitung / $jumlah_hari) * 100;
+        }
+
+        if ($presentase_kehadiran === 100.0) {
+            $jumlah_kehadiran = 1;
+        } else {
+            $jumlah_kehadiran = 0;
+        }
+
+        // --- Return dua nilai yang kamu minta (dalam array) ---
+        return [
+            'presentase_kehadiran' => $presentase_kehadiran,
+            'jumlah_kehadiran' => $jumlah_kehadiran
+        ];
+    }
+
     public function payroll(Request $request, $id)
     {
         $user = User::query()->find($id);
@@ -96,22 +132,11 @@ class RekapDataController extends Controller
         $pecah_tanggal = explode("-", $mulai);
         $tahun_filter = $pecah_tanggal[0];
         $bulan_filter = $pecah_tanggal[1];
-        $jumlah_hadir = $user->MappingShift->whereBetween('tanggal', [$mulai, $akhir])->where('status_absen', '=', 'Masuk')->count();
-        $jumlah_izin_telat = $user->MappingShift->whereBetween('tanggal', [$mulai, $akhir])->where('status_absen', 'Izin Telat')->count();
-        $jumlah_izin_pulang_cepat = $user->MappingShift->whereBetween('tanggal', [$mulai, $akhir])->where('status_absen', 'Izin Pulang Cepat')->count();
-        $libur = $user->MappingShift->whereBetween('tanggal', [$mulai, $akhir])->where('status_absen', 'Libur')->count();
-        $timestamp_mulai = strtotime($mulai);
-        $timestamp_akhir = strtotime($akhir);
-        $selisih_timestamp = $timestamp_akhir - $timestamp_mulai;
-        $jumlah_hari = (floor($selisih_timestamp / (60 * 60 * 24))) + 1;
-        $presentase_kehadiran = (($jumlah_hadir + $jumlah_izin_telat + $jumlah_izin_pulang_cepat + $libur) / $jumlah_hari) * 100;
 
-        // Proses Data Bagian Pendapatan
-        if ($presentase_kehadiran === 100) {
-            $jumlah_kehadiran = 1;
-        } else {
-            $jumlah_kehadiran = 0;
-        }
+        $hitungMetrikKehadiran = $this->hitungMetrikKehadiran($user, $mulai, $akhir);
+        $presentase_kehadiran = $hitungMetrikKehadiran['presentase_kehadiran'];
+        $jumlah_kehadiran = $hitungMetrikKehadiran['jumlah_kehadiran'];
+
         $total_lembur = $user->Lembur->where('status', 'Approved')->whereBetween('tanggal', [$mulai, $akhir])->sum('total_lembur');
         $jam_lembur = floor($total_lembur / (60 * 60));
         $total_oncall = $user->Oncall->where('status', 'Approved')->whereBetween('tanggal', [$mulai, $akhir])->sum('total_oncall');
@@ -193,24 +218,24 @@ class RekapDataController extends Controller
                 'gaji_pokok' => 'required',
                 'jumlah_kehadiran' => 'required',
                 'uang_kehadiran' => 'required',
-                'total_kehadiran' => 'required',
+//                'total_kehadiran' => 'required',
                 'jumlah_lembur' => 'required',
                 'uang_lembur' => 'required',
-                'total_lembur' => 'required',
+//                'total_lembur' => 'required',
                 'jumlah_oncall' => 'required',
                 'uang_oncall' => 'required',
-                'total_oncall' => 'required',
+//                'total_oncall' => 'required',
                 //            'saldo_kasbon' => 'required',
                 //            'bayar_kasbon' => 'required',
                 'jumlah_izin' => 'required',
                 'uang_izin' => 'required',
-                'total_izin' => 'required',
+//                'total_izin' => 'required',
                 'jumlah_terlambat' => 'required',
                 'uang_terlambat' => 'required',
-                'total_terlambat' => 'required',
+//                'total_terlambat' => 'required',
                 'jumlah_mangkir' => 'required',
                 'uang_mangkir' => 'required',
-                'total_mangkir' => 'required',
+//                'total_mangkir' => 'required',
                 'potongan_bpjs_kesehatan' => 'sometimes',
                 'id_Jaminan_Hari_Tua' => [
                         'sometimes',
@@ -246,11 +271,11 @@ class RekapDataController extends Controller
                 'uang_transport' => 'required',
                 'jumlah_bonus' => 'required',
                 'uang_bonus' => 'required',
-                'total_bonus' => 'required',
+//                'total_bonus' => 'required',
                 'jumlah_thr' => 'required',
                 'uang_thr' => 'required',
-                'total_thr' => 'required',
-                //            'loss' => 'required',
+//                'total_thr' => 'required',
+//                'loss' => 'required',
                 'total_penjumlahan' => 'required',
                 'total_pengurangan' => 'required',
                 'grand_total' => 'required',
@@ -261,61 +286,96 @@ class RekapDataController extends Controller
             return redirect('/rekap-data/get-data?mulai=' . $request['mulai'] . '&akhir=' . $request['akhir'])->with('failed', 'Data Berhasil Disimpan');
         }
 
+        $user = User::query()->find($request['user_id']);
+        $mulai = $request->input('mulai');
+        $akhir = $request->input('akhir');
+        $dataKaryawan = $this->karyawanService->getCutiIzinUpahDeduksiKaryawan($user->golongan_id, $user->tipe_karyawan);
+        $hitungMetrikKehadiran = $this->hitungMetrikKehadiran($user, $mulai, $akhir);
+
+        $gaji_pokok = $dataKaryawan['upah'][0]['gaji_pokok'];
+        $presentase_kehadiran = $hitungMetrikKehadiran['presentase_kehadiran'];
+        $jumlah_kehadiran = $hitungMetrikKehadiran['jumlah_kehadiran'];
+        $uang_kehadiran = $dataKaryawan['upah'][0]['kehadiran'];
+        $total_kehadiran = $jumlah_kehadiran * $uang_kehadiran;
+        $uang_lembur = $dataKaryawan['upah'][0]['lembur'];
+        $total_lembur = $validated['jumlah_lembur'] * $uang_lembur;
+        $uang_oncall = $dataKaryawan['upah'][0]['oncall'];
+        $total_oncall = $validated['jumlah_oncall'] * $uang_oncall;
+        $uang_izin = (int)$dataKaryawan['deduksi'][0]['nominal'];
+        $total_izin = $validated['jumlah_izin'] * $uang_izin;
+        $uang_terlambat = (int)$dataKaryawan['deduksi'][1]['nominal'];
+        $total_terlambat = $validated['jumlah_terlambat'] * $uang_terlambat;
+        $uang_mangkir = $dataKaryawan['deduksi'][2]['nominal'];
+        $total_mangkir = $validated['jumlah_mangkir'] * $uang_mangkir;
+        $uang_bonus = (int)$user->Golongan->Tunjangan->bonus;
+        $total_bonus = $validated['jumlah_bonus'] * $uang_bonus;
+        $uang_thr = (int)$user->Golongan->Tunjangan->thr;
+        $total_thr = $validated['jumlah_thr'] * $uang_thr;
+        $total_penjumlahan = $gaji_pokok + (int)str_replace(',', '', $request['uang_makan']) + (int)str_replace(',', '', $request['uang_transport']) + $total_lembur + $total_oncall + $total_bonus + $total_kehadiran + $total_thr;
+        $bpjs_kesehatan = $request['potongan_bpjs_kesehatan'] ? (int)str_replace(',', '', $request['potongan_bpjs_kesehatan']) : 0;
+        $bpjs_ketenagakerjaan_jht = $request['potongan_Jaminan_Hari_Tua'] ? (int)str_replace(',', '', $request['potongan_Jaminan_Hari_Tua']) : 0;
+        $bpjs_ketenagakerjaan_jp = $request['potongan_Jaminan_Pensiun'] ? (int)str_replace(',', '', $request['potongan_Jaminan_Pensiun']) : 0;
+        $bpjs_ketenagakerjaan_jk = $request['potongan_Jaminan_Kematian'] ? (int)str_replace(',', '', $request['potongan_Jaminan_Kematian']) : 0;
+        $bpjs_ketenagakerjaan_jkp = $request['potongan_Jaminan_Kehilangan_Pekerjaan'] ? (int)str_replace(',', '', $request['potongan_Jaminan_Kehilangan_Pekerjaan']) : 0;
+        $bpjs_ketenagakerjaan_jkk = $request['potongan_Jaminan_Kecelakaan_Kerja'] ? (int)str_replace(',', '', $request['potongan_Jaminan_Kecelakaan_Kerja']) : 0;
+        $total_pengurangan = $total_mangkir + $total_izin + $total_terlambat + $bpjs_kesehatan + $bpjs_ketenagakerjaan_jht + $bpjs_ketenagakerjaan_jp + $bpjs_ketenagakerjaan_jk + $bpjs_ketenagakerjaan_jkp + $bpjs_ketenagakerjaan_jkk;
+
         $validated['user_id'] = (int)str_replace(',', '', $validated['user_id']);
         $validated['bulan'] = (int)str_replace(',', '', $validated['bulan']);
         $validated['tahun'] = (int)str_replace(',', '', $validated['tahun']);
 //        $validated['no_gaji'] = str_replace(',', '', $validated['no_gaji']);
-        $validated['persentase_kehadiran'] = (int)(str_replace(',', '', $validated['persentase_kehadiran']) ?? 0);
-        $validated['gaji_pokok'] = (int)(str_replace(',', '', $validated['gaji_pokok']) ?? '0');
-        $validated['jumlah_kehadiran'] = (int)(str_replace(',', '', $validated['jumlah_kehadiran']) ?? '0');
-        $validated['uang_kehadiran'] = (int)(str_replace(',', '', $validated['uang_kehadiran']) ?? '0');
-        $validated['total_kehadiran'] = (int)(str_replace(',', '', $validated['total_kehadiran']) ?? '0');
+//        $validated['persentase_kehadiran'] = (int)(str_replace(',', '', $validated['persentase_kehadiran']) ?? 0);
+        $validated['persentase_kehadiran'] = $presentase_kehadiran ?? 0;
+        $validated['gaji_pokok'] = $gaji_pokok ?? '0';
+        $validated['jumlah_kehadiran'] = $jumlah_kehadiran ?? 0;
+        $validated['uang_kehadiran'] = $uang_kehadiran ?? '0';
+        $validated['total_kehadiran'] = $total_kehadiran ?? 0;
         $validated['jumlah_lembur'] = (int)(str_replace(',', '', $validated['jumlah_lembur']) ?? '0');
-        $validated['uang_lembur'] = (int)(str_replace(',', '', $validated['uang_lembur']) ?? '0');
-        $validated['total_lembur'] = (int)(str_replace(',', '', $validated['total_lembur']) ?? '0');
+        $validated['uang_lembur'] = $uang_lembur ?? '0';
+        $validated['total_lembur'] = $total_lembur ?? 0;
         $validated['jumlah_oncall'] = (int)(str_replace(',', '', $validated['jumlah_oncall']) ?? '0');
-        $validated['uang_oncall'] = (int)(str_replace(',', '', $validated['uang_oncall']) ?? '0');
-        $validated['total_oncall'] = (int)(str_replace(',', '', $validated['total_oncall']) ?? '0');
+        $validated['uang_oncall'] = $uang_oncall ?? '0';
+        $validated['total_oncall'] = $total_oncall ?? 0;
 //        $validated['saldo_kasbon'] = '0';
 //        $validated['bayar_kasbon'] = '0';
         $validated['jumlah_izin'] = (int)(str_replace(',', '', $validated['jumlah_izin']) ?? '0');
-        $validated['uang_izin'] = (int)(str_replace(',', '', $validated['uang_izin']) ?? '0');
-        $validated['total_izin'] = (int)(str_replace(',', '', $validated['total_izin']) ?? '0');
-        $validated['jumlah_terlambat'] = (int)(str_replace(',', '', $validated['jumlah_izin']) ?? '0');
-        $validated['uang_terlambat'] = (int)(str_replace(',', '', $validated['uang_terlambat']) ?? '0');
-        $validated['total_terlambat'] = (int)(str_replace(',', '', $validated['total_terlambat']) ?? '0');
-        $validated['jumlah_mangkir'] = (int)(str_replace(',', '', $validated['jumlah_izin']) ?? '0');
-        $validated['uang_mangkir'] = (int)(str_replace(',', '', $validated['uang_mangkir']) ?? '0');
-        $validated['total_mangkir'] = (int)(str_replace(',', '', $validated['total_mangkir']) ?? '0');
-        $validated['potongan_bpjs_kesehatan'] = $request['potongan_bpjs_kesehatan'] ? (int)str_replace(',', '', $request['potongan_bpjs_kesehatan']) : 0;
+        $validated['uang_izin'] = $uang_izin ?? '0';
+        $validated['total_izin'] = $total_izin ?? 0;
+        $validated['jumlah_terlambat'] = (int)(str_replace(',', '', $validated['jumlah_terlambat']) ?? '0');
+        $validated['uang_terlambat'] = $uang_terlambat ?? '0';
+        $validated['total_terlambat'] = $total_terlambat ?? 0;
+        $validated['jumlah_mangkir'] = $total_mangkir ?? 0;
+        $validated['uang_mangkir'] = $uang_mangkir ?? '0';
+        $validated['total_mangkir'] = $total_mangkir ?? 0;
+        $validated['potongan_bpjs_kesehatan'] = $bpjs_kesehatan;
         $validated['id_Jaminan_Hari_Tua'] = $request['id_Jaminan_Hari_Tua'] ? (int) $request['id_Jaminan_Hari_Tua'] : 0;
-        $validated['potongan_Jaminan_Hari_Tua'] = $request['potongan_Jaminan_Hari_Tua'] ? (int)str_replace(',', '', $request['potongan_Jaminan_Hari_Tua']) : 0;
+        $validated['potongan_Jaminan_Hari_Tua'] = $bpjs_ketenagakerjaan_jht;
         $validated['id_Jaminan_Pensiun'] = $request['id_Jaminan_Pensiun'] ? (int) $request['id_Jaminan_Pensiun'] : 0;
-        $validated['potongan_Jaminan_Pensiun'] = $request['potongan_Jaminan_Pensiun'] ? (int)str_replace(',', '', $request['potongan_Jaminan_Pensiun']) : 0;
+        $validated['potongan_Jaminan_Pensiun'] = $bpjs_ketenagakerjaan_jp;
         $validated['id_Jaminan_Kematian'] = $request['id_Jaminan_Kematian'] ? (int) $request['id_Jaminan_Kematian'] : 0;
-        $validated['potongan_Jaminan_Kematian'] = $request['potongan_Jaminan_Kematian'] ? (int)str_replace(',', '', $request['potongan_Jaminan_Kematian']) : 0;
+        $validated['potongan_Jaminan_Kematian'] = $bpjs_ketenagakerjaan_jk;
         $validated['id_Jaminan_Kehilangan_Pekerjaan'] = $request['id_Jaminan_Kehilangan_Pekerjaan'] ? (int) $request['id_Jaminan_Kehilangan_Pekerjaan'] : 0;
-        $validated['potongan_Jaminan_Kehilangan_Pekerjaan'] = $request['potongan_Jaminan_Kehilangan_Pekerjaan'] ? (int)str_replace(',', '', $request['potongan_Jaminan_Kehilangan_Pekerjaan']) : 0;
+        $validated['potongan_Jaminan_Kehilangan_Pekerjaan'] = $bpjs_ketenagakerjaan_jkp;
         $validated['id_Jaminan_Kecelakaan_Kerja'] = $request['id_Jaminan_Kecelakaan_Kerja'] ? (int) $request['id_Jaminan_Kecelakaan_Kerja'] : 0;
-        $validated['potongan_Jaminan_Kecelakaan_Kerja'] = $request['potongan_Jaminan_Kecelakaan_Kerja'] ? (int)str_replace(',', '', $request['potongan_Jaminan_Kecelakaan_Kerja']) : 0;
+        $validated['potongan_Jaminan_Kecelakaan_Kerja'] = $bpjs_ketenagakerjaan_jkk;
         $validated['uang_makan'] = (int)(str_replace(',', '', $validated['uang_makan']) ?? '0');
         $validated['uang_transport'] = (int)(str_replace(',', '', $validated['uang_transport']) ?? '0');
         $validated['jumlah_bonus'] = (int)(str_replace(',', '', $validated['jumlah_bonus']) ?? '0');
-        $validated['uang_bonus'] = (int)(str_replace(',', '', $validated['uang_bonus']) ?? '0');
-        $validated['total_bonus'] = (int)(str_replace(',', '', $validated['total_bonus']) ?? '0');
+        $validated['uang_bonus'] = $uang_bonus ?? '0';
+        $validated['total_bonus'] = $total_bonus ?? 0;
         $validated['jumlah_thr'] = (int)(str_replace(',', '', $validated['jumlah_thr']) ?? '0');
-        $validated['uang_thr'] = (int)(str_replace(',', '', $validated['uang_thr']) ?? '0');
-        $validated['total_thr'] = (int)(str_replace(',', '', $validated['total_thr']) ?? '0');
+        $validated['uang_thr'] = $uang_thr ?? '0';
+        $validated['total_thr'] = $total_thr ?? 0;
 //        $validated['loss'] = '0';
-        $validated['total_penjumlahan'] = (int)(str_replace(',', '', $validated['total_penjumlahan']) ?? '0');
-        $validated['total_pengurangan'] = (int)(str_replace(',', '', $validated['total_pengurangan']) ?? '0');
-        $validated['grand_total'] = (int)(str_replace(',', '', $validated['grand_total']) ?? '0');
+        $validated['total_penjumlahan'] = $total_penjumlahan ?? '0';
+        $validated['total_pengurangan'] = $total_pengurangan ?? 0;
+        $validated['grand_total'] = $total_penjumlahan - $total_pengurangan;
 
 //        $user = User::find($request['user_id']);
 //        $user->update(['saldo_kasbon' => $user->saldo_kasbon - $validated['bayar_kasbon']]);
 
         try {
-            Payroll::create($validated);
+            Payroll::query()->create($validated);
         } catch (\Exception $e) {
             Alert::error('Failed', 'Data Gagal Disimpan!');
             Log::error($e->getMessage());

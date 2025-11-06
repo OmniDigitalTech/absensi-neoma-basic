@@ -206,7 +206,7 @@
                                     </div>
                                     @enderror
                                 </div>
-                                <input type="hidden" name="total_kehadiran" id="total_kehadiran" value="{{ old('total_kehadiran') }}">
+{{--                                <input type="hidden" name="total_kehadiran" id="total_kehadiran" value="{{ old('total_kehadiran') }}">--}}
                             </div>
                         </div>
                     </div>
@@ -236,7 +236,7 @@
                                     </div>
                                     @enderror
                                 </div>
-                                <input type="hidden" name="total_lembur" id="total_lembur" value="{{ old('total_lembur') }}">
+{{--                                <input type="hidden" name="total_lembur" id="total_lembur" value="{{ old('total_lembur') }}">--}}
                             </div>
                         </div>
                         <div class="col mb-4">
@@ -264,7 +264,7 @@
                                     </div>
                                     @enderror
                                 </div>
-                                <input type="hidden" name="total_oncall" id="total_oncall" value="{{ old('total_oncall') }}">
+{{--                                <input type="hidden" name="total_oncall" id="total_oncall" value="{{ old('total_oncall') }}">--}}
                             </div>
                         </div>
                     </div>
@@ -297,7 +297,7 @@
                                     </div>
                                     @enderror
                                 </div>
-                                <input type="hidden" name="total_izin" id="total_izin" value="{{ old('total_izin') }}">
+{{--                                <input type="hidden" name="total_izin" id="total_izin" value="{{ old('total_izin') }}">--}}
                             </div>
                         </div>
                         <div class="col mb-4">
@@ -331,8 +331,7 @@
                                     </div>
                                     @enderror
                                 </div>
-                                <input type="hidden" name="total_terlambat" id="total_terlambat"
-                                       value="{{ old('total_terlambat') }}">
+{{--                                <input type="hidden" name="total_terlambat" id="total_terlambat" value="{{ old('total_terlambat') }}">--}}
                             </div>
                         </div>
                     </div>
@@ -362,7 +361,7 @@
                                     </div>
                                     @enderror
                                 </div>
-                                <input type="hidden" name="total_mangkir" id="total_mangkir" value="{{ old('total_mangkir') }}">
+{{--                                <input type="hidden" name="total_mangkir" id="total_mangkir" value="{{ old('total_mangkir') }}">--}}
                             </div>
                         </div>
                     </div>
@@ -430,7 +429,7 @@
                                     </div>
                                     @enderror
                                 </div>
-                                <input type="hidden" name="total_bonus" id="total_bonus" value="{{ old('total_bonus') }}">
+{{--                                <input type="hidden" name="total_bonus" id="total_bonus" value="{{ old('total_bonus') }}">--}}
                             </div>
                         </div>
                          <div class="col mb-4">
@@ -458,7 +457,7 @@
                                         </div>
                                     @enderror
                                 </div>
-                                <input type="hidden" name="total_thr" id="total_thr" value="{{ old('total_thr') }}">
+{{--                                <input type="hidden" name="total_thr" id="total_thr" value="{{ old('total_thr') }}">--}}
                             </div>
                         </div>
                     </div>
@@ -523,29 +522,29 @@
                     var jumlah_lembur = $('#jumlah_lembur').val() ? parseFloat($('#jumlah_lembur').val()) : 0;
                     var uang_lembur = $('#uang_lembur').val() ? parseFloat(replaceCurrency($('#uang_lembur').val())) : 0;
                     var total_lembur = jumlah_lembur * uang_lembur;
-                    $('#total_lembur').val(accounting.formatMoney(total_lembur, '', 0, ",", "."));
+                    // $('#total_lembur').val(accounting.formatMoney(total_lembur, '', 0, ",", "."));
 
                     var jumlah_oncall = $('#jumlah_oncall').val() ? parseFloat($('#jumlah_oncall').val()) : 0;
                     var uang_oncall = $('#uang_oncall').val() ? parseFloat(replaceCurrency($('#uang_oncall').val())) : 0;
                     var total_oncall = jumlah_oncall * uang_oncall;
-                    $('#total_oncall').val(accounting.formatMoney(total_oncall, '', 0, ",", "."));
+                    // $('#total_oncall').val(accounting.formatMoney(total_oncall, '', 0, ",", "."));
 
                     var jumlah_bonus = $('#jumlah_bonus').val() ? parseFloat($('#jumlah_bonus').val()) : 0;
                     var uang_bonus = $('#uang_bonus').val() ? parseFloat(replaceCurrency($('#uang_bonus').val())) : 0;
                     var total_bonus = jumlah_bonus * uang_bonus;
-                    $('#total_bonus').val(accounting.formatMoney(total_bonus, '', 0, ",", "."));
+                    // $('#total_bonus').val(accounting.formatMoney(total_bonus, '', 0, ",", "."));
 
                     var jumlah_kehadiran = $('#jumlah_kehadiran').val() ? parseFloat($('#jumlah_kehadiran').val()) : 0;
                     var uang_kehadiran = $('#uang_kehadiran').val() ? parseFloat(replaceCurrency($('#uang_kehadiran').val())) : 0;
                     var total_kehadiran = jumlah_kehadiran * uang_kehadiran;
-                    $('#total_kehadiran').val(accounting.formatMoney(total_kehadiran, '', 0, ",", "."));
+                    // $('#total_kehadiran').val(accounting.formatMoney(total_kehadiran, '', 0, ",", "."));
 
                     var jumlah_thr = $('#jumlah_thr').val() ? parseFloat($('#jumlah_thr').val()) : 0;
                     var uang_thr = $('#uang_thr').val() ? parseFloat(replaceCurrency($('#uang_thr').val())) : 0;
                     var total_thr = jumlah_thr * uang_thr;
-                    $('#total_thr').val(accounting.formatMoney(total_thr, '', 0, ",", "."));
+                    // $('#total_thr').val(accounting.formatMoney(total_thr, '', 0, ",", "."));
 
-                    var total_penjumlahan = gaji_pokok + uang_makan + uang_transport + total_lembur + total_oncall + total_bonus + total_kehadiran + total_thr;
+                    let total_penjumlahan = gaji_pokok + uang_makan + uang_transport + total_lembur + total_oncall + total_bonus + total_kehadiran + total_thr;
 
                     $('#total_penjumlahan').val(accounting.formatMoney(total_penjumlahan, '', 0, ",", "."));
 
@@ -553,19 +552,19 @@
                     var jumlah_mangkir = $('#jumlah_mangkir').val() ? parseFloat($('#jumlah_mangkir').val()) : 0;
                     var uang_mangkir = $('#uang_mangkir').val() ? parseFloat(replaceCurrency($('#uang_mangkir').val())) : 0;
                     var total_mangkir = jumlah_mangkir * uang_mangkir;
-                    $('#total_mangkir').val(accounting.formatMoney(total_mangkir, '', 0, ",", "."));
+                    // $('#total_mangkir').val(accounting.formatMoney(total_mangkir, '', 0, ",", "."));
 
                     var jumlah_izin = $('#jumlah_izin').val() ? parseFloat($('#jumlah_izin').val()) : 0;
                     var uang_izin = $('#uang_izin').val() ? parseFloat(replaceCurrency($('#uang_izin').val())) : 0;
                     var total_izin = jumlah_izin * uang_izin;
-                    $('#total_izin').val(accounting.formatMoney(total_izin, '', 0, ",", "."));
+                    // $('#total_izin').val(accounting.formatMoney(total_izin, '', 0, ",", "."));
 
                     var jumlah_terlambat = $('#jumlah_terlambat').val() ? parseFloat($('#jumlah_terlambat').val()) : 0;
                     var uang_terlambat = $('#uang_terlambat').val() ? parseFloat(replaceCurrency($('#uang_terlambat').val())) : 0;
                     var total_terlambat = jumlah_terlambat * uang_terlambat;
-                    $('#total_terlambat').val(accounting.formatMoney(total_terlambat, '', 0, ",", "."));
+                    // $('#total_terlambat').val(accounting.formatMoney(total_terlambat, '', 0, ",", "."));
 
-                    let bpjs_kesehatan = $('#bpjs_kesehatan').val() ? parseFloat(replaceCurrency($('#bpjs_kesehatan').val())) : 0;
+                    let bpjs_kesehatan = $('#potongan_bpjs_kesehatan').val() ? parseFloat(replaceCurrency($('#potongan_bpjs_kesehatan').val())) : 0;
 
                     let bpjs_ketenagakerjaan_jht = $('#potongan_Jaminan_Hari_Tua').val() ? parseFloat(replaceCurrency($('#potongan_Jaminan_Hari_Tua').val())) : 0;
                     let bpjs_ketenagakerjaan_jp = $('#potongan_Jaminan_Pensiun').val() ? parseFloat(replaceCurrency($('#potongan_Jaminan_Pensiun').val())) : 0;
@@ -574,13 +573,13 @@
                     let bpjs_ketenagakerjaan_jkk = $('#potongan_Jaminan_Kecelakaan_Kerja').val() ? parseFloat(replaceCurrency($('#potongan_Jaminan_Kecelakaan_Kerja').val())) : 0;
 
                     // var total_pengurangan = total_mangkir + total_izin + total_terlambat + bayar_kasbon + loss;
-                    var total_pengurangan = total_mangkir + total_izin + total_terlambat + bpjs_kesehatan + bpjs_ketenagakerjaan_jht + bpjs_ketenagakerjaan_jp + bpjs_ketenagakerjaan_jk + bpjs_ketenagakerjaan_jkp + bpjs_ketenagakerjaan_jkk;
+                    let total_pengurangan = total_mangkir + total_izin + total_terlambat + bpjs_kesehatan + bpjs_ketenagakerjaan_jht + bpjs_ketenagakerjaan_jp + bpjs_ketenagakerjaan_jk + bpjs_ketenagakerjaan_jkp + bpjs_ketenagakerjaan_jkk;
 
                     $('#total_pengurangan').val(accounting.formatMoney(total_pengurangan, '', 0, ",", "."));
 
                     $("#submit").prop('disabled', false);
 
-                    var grand_total = total_penjumlahan - total_pengurangan;
+                    let grand_total = total_penjumlahan - total_pengurangan;
                     $('#grand_total').val(accounting.formatMoney(grand_total, '', 0, ",", "."));
                     Swal.fire('Berhasil Proses Data, Klik Simpan Untuk Melanjutkan', '', 'success');
                     setTimeout(function() {

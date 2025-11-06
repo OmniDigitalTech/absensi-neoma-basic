@@ -74,7 +74,7 @@
                         <div class="col-3">
                             <select name="tahun" id="tahun" class="form-control selectpicker" data-live-search="true">
                                 @for ($i = $now; $i >= $last; $i--)
-                                @if(old('tahun', $now) == $i)
+                                @if(old('tahun', $now) === $i)
                                 <option value="{{ $i }}" selected>{{ $i }}</option>
                                 @else
                                 <option value="{{ $i }}">{{ $i }}</option>
@@ -86,7 +86,7 @@
                             <select name="bulan" id="bulan" class="form-control selectpicker" data-live-search="true">
                                 <option value="" selected>Bulan</option>
                                 @foreach($bulan as $bul)
-                                @if(request('bulan') == $bul['id'])
+                                @if(request('bulan') === $bul['id'])
                                 <option value="{{ $bul['id'] }}" selected>{{ $bul['bulan'] }}</option>
                                 @else
                                 <option value="{{ $bul['id'] }}">{{ $bul['bulan'] }}</option>
@@ -113,6 +113,8 @@
                                 <th>Bulan</th>
 {{--                                <th>Kasbon</th>--}}
                                 <th>Grand Total</th>
+                                <th>Dibuat</th>
+                                <th>Diedit</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -125,29 +127,29 @@
                                 <td>{{ $d->User->Jabatan->nama_jabatan  }}</td>
                                 <td>
                                     @php
-                                    if ($d->bulan == 1){
+                                    if ($d->bulan === 1){
                                     $nama_bulan = 'Januari';
-                                    } else if($d->bulan == 2) {
+                                    } else if($d->bulan === 2) {
                                     $nama_bulan = 'Februari';
-                                    } else if($d->bulan == 3) {
+                                    } else if($d->bulan === 3) {
                                     $nama_bulan = 'Maret';
-                                    } else if($d->bulan == 4) {
+                                    } else if($d->bulan === 4) {
                                     $nama_bulan = 'April';
-                                    } else if($d->bulan == 5) {
+                                    } else if($d->bulan === 5) {
                                     $nama_bulan = 'Mei';
-                                    } else if($d->bulan == 6) {
+                                    } else if($d->bulan === 6) {
                                     $nama_bulan = 'Juni';
-                                    } else if($d->bulan == 7) {
+                                    } else if($d->bulan === 7) {
                                     $nama_bulan = 'Juli';
-                                    } else if($d->bulan == 8) {
+                                    } else if($d->bulan === 8) {
                                     $nama_bulan = 'Agustus';
-                                    } else if($d->bulan == 9) {
+                                    } else if($d->bulan === 9) {
                                     $nama_bulan = 'September';
-                                    } else if($d->bulan == 10) {
+                                    } else if($d->bulan === 10) {
                                     $nama_bulan = 'Oktober';
-                                    } else if($d->bulan == 11) {
+                                    } else if($d->bulan === 11) {
                                     $nama_bulan = 'November';
-                                    } else if($d->bulan == 12) {
+                                    } else if($d->bulan === 12) {
                                     $nama_bulan = 'Desember';
                                     } else {
                                     $nama_bulan = '-';
@@ -157,6 +159,8 @@
                                 </td>
 {{--                                <td>Rp {{ number_format($d->bayar_kasbon) }}</td>--}}
                                 <td>Rp {{ number_format($d->grand_total) }}</td>
+                                <td>{{ $d->created_at }}</td>
+                                <td>{{ $d->updated_at }}</td>
                                 <td>
                                     <ul class="action">
                                         <li class="me-2">
