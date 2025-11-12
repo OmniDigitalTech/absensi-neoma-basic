@@ -8,6 +8,8 @@ use App\Models\Lokasi;
 use App\Models\Jabatan;
 use App\Models\Golongan;
 use App\Models\MappingShift;
+use App\Models\KetenagakerjaanJkk;
+use App\Models\Kesehatan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -234,6 +236,7 @@ class authController extends Controller
             'email' => 'required|email:dns|unique:users',
             'password' => 'required|confirmed|min:5|max:255',
             'jabatan_id' => 'required',
+            'golongan_id' => 'required',
             'lokasi_id' => 'required',
         ]);
 
@@ -246,6 +249,45 @@ class authController extends Controller
         User::create($validatedData);
         return redirect('/')->with('success', 'Berhasil Register! Silahkan Login');
     }
+
+//    public function registerProses(Request $request)
+//    {
+//        $validatedData = $request->validate([
+//            'name' => 'required|max:255',
+//            'nik' => 'required|max:10',
+//            'username' => 'required|unique:users|min:4|max:8',
+//            'email' => 'required|email:dns|unique:users',
+//            'password' => 'required|confirmed|min:5|max:255',
+//            'jabatan_id' => 'required',
+//            'golongan_id' => 'required',
+//            'lokasi_id' => 'required',
+//        ]);
+//
+//        if ($request->file('foto_karyawan')) {
+//            $validatedData['foto_karyawan'] = $request->file('foto_karyawan')->store('foto_karyawan');
+//        }
+//
+//        $validatedData['is_admin'] = 'user';
+//        $validatedData['password'] = Hash::make($validatedData['password']);
+//        $user = User::create($validatedData);
+//
+//        // Buat data BPJS default agar tidak null
+//        KetenagakerjaanJkk::create([
+//            'user_id' => $user->id,
+//            'status' => 'aktif',
+//            'nomor_bpjs' => null,
+//            'potongan' => 0,
+//        ]);
+//
+//        Kesehatan::create([
+//            'user_id' => $user->id,
+//            'status' => 'aktif',
+//            'nomor_bpjs' => null,
+//            'potongan' => 0,
+//        ]);
+//
+//        return redirect('/')->with('success', 'Berhasil Register! Silahkan Login');
+//    }
 
     public function loginProses(Request $request)
     {

@@ -68,7 +68,7 @@
     <div class="group-input mt-4">
         <label>Jabatan</label>
         <select name="jabatan_id" id="jabatan_id">
-            <option value="">- - Pilih - -</option>
+            <option value="">- - Pilih Jabatan - -</option>
             @foreach ($data_jabatan as $dj)
             @if(old('jabatan_id') == $dj->id)
             <option value="{{ $dj->id }}" selected>{{ $dj->nama_jabatan }}</option>
@@ -85,9 +85,28 @@
     </div>
 
     <div class="group-input mt-4">
+        <label>Golongan</label>
+        <select name="golongan_id" id="golongan_id">
+            <option value="">- - Pilih Golongan - -</option>
+            @foreach ($golongan as $dg)
+                @if(old('golongan_id') == $dg->id)
+                    <option value="{{ $dg->id }}" selected>{{ $dg->name }}</option>
+                @else
+                    <option value="{{ $dg->id }}">{{ $dg->name }}</option>
+                @endif
+            @endforeach
+        </select>
+        @error('golongan_id')
+        <div class="invalid-feedback">
+            {{ $message }}
+        </div>
+        @enderror
+    </div>
+
+    <div class="group-input mt-4">
         <label>Lokasi</label>
         <select name="lokasi_id" id="lokasi_id">
-            <option value="">- - Pilih - -</option>
+            <option value="">- - Pilih Lokasi - -</option>
             @foreach ($data_lokasi as $dl)
             @if(old('lokasi_id') == $dl->id)
             <option value="{{ $dl->id }}" selected>{{ $dl->nama_lokasi }}</option>
