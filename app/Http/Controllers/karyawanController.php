@@ -541,15 +541,83 @@ class karyawanController extends Controller
      * @throws \DateMalformedStringException
      * @throws \DateMalformedPeriodStringException
      */
+//    public function prosesTambahShift(Request $request)
+//    {
+//        date_default_timezone_set('Asia/Jakarta');
+//
+//        if($request["tanggal_mulai"] === null) {
+//            $request["tanggal_mulai"] = $request["tanggal_akhir"];
+//        }
+//
+//        if($request["tanggal_akhir"] === null) {
+//            $request["tanggal_akhir"] = $request["tanggal_mulai"];
+//        }
+//
+//        $userId = $request['user_id'];
+//        $tglMulai = $request['tanggal_mulai'];
+//        $tglAkhir = $request['tanggal_akhir'];
+//
+//        $isAvailable = $this->karyawanService->isCutiIzinScheduleAvailable($userId, $tglMulai, $tglAkhir);
+//
+//        if(!$isAvailable) {
+//            Alert::error('Peringatan!', 'Tanggal "'.$tglMulai.' sampai '.$tglAkhir.'" sudah ada ajuan Cuti/Izin');
+//            return redirect('/cuti');
+//        }
+//
+//        $request->validate([
+//            'shift_id' => 'required',
+//            'tanggal_mulai' => 'required',
+//            'tanggal_akhir' => 'required',
+//        ]);
+//
+//        $begin = new \DateTime($request["tanggal_mulai"]);
+//        $end = new \DateTime($request["tanggal_akhir"]);
+//        $end = $end->modify('+1 day');
+//
+//        $interval = new \DateInterval('P1D'); //referensi : https://en.wikipedia.org/wiki/ISO_8601#Durations
+//        $daterange = new \DatePeriod($begin, $interval ,$end);
+//
+//
+//        foreach ($daterange as $date) {
+//            $tanggal = $date->format("Y-m-d");
+//
+//            $cek = MappingShift::query()->where('user_id', $request['user_id'])->where('tanggal', $tanggal)->first();
+//
+//            if (!$cek) {
+//                if ($request["shift_id"] === 1) {
+//                    $request["status_absen"] = "Libur";
+//                } else {
+//                    $request["status_absen"] = "Tidak Masuk";
+//                }
+//
+//                $request["tanggal"] = $tanggal;
+//
+//                $validatedData = $request->validate([
+//                    'user_id' => 'required',
+//                    'shift_id' => 'required',
+//                    'tanggal' => 'required',
+//                    'status_absen' => 'required',
+//                ]);
+//
+//                $validatedData['lock_location'] = $request['lock_location'] ?: null;
+//                $validatedData['telat'] = 0;
+//                $validatedData['pulang_cepat'] = 0;
+//
+//                MappingShift::create($validatedData);
+//            }
+//        }
+//        return redirect('/pegawai/shift/' . $request["user_id"])->with('success', 'Data Berhasil di Tambahkan');
+//    }
+
     public function prosesTambahShift(Request $request)
     {
         date_default_timezone_set('Asia/Jakarta');
 
-        if($request["tanggal_mulai"] === null) {
+        if ($request["tanggal_mulai"] === null) {
             $request["tanggal_mulai"] = $request["tanggal_akhir"];
         }
 
-        if($request["tanggal_akhir"] === null) {
+        if ($request["tanggal_akhir"] === null) {
             $request["tanggal_akhir"] = $request["tanggal_mulai"];
         }
 
@@ -559,7 +627,7 @@ class karyawanController extends Controller
 
         $isAvailable = $this->karyawanService->isCutiIzinScheduleAvailable($userId, $tglMulai, $tglAkhir);
 
-        if(!$isAvailable) {
+        if (!$isAvailable) {
             Alert::error('Peringatan!', 'Tanggal "'.$tglMulai.' sampai '.$tglAkhir.'" sudah ada ajuan Cuti/Izin');
             return redirect('/cuti');
         }
@@ -570,43 +638,55 @@ class karyawanController extends Controller
             'tanggal_akhir' => 'required',
         ]);
 
-        $begin = new \DateTime($request["tanggal_mulai"]);
-        $end = new \DateTime($request["tanggal_akhir"]);
-        $end = $end->modify('+1 day');
+        $begin = new \DateTime($tglMulai);
+        $end   = new \DateTime($tglAkhir);
+        $end   = $end->modify('+1 day');
 
-        $interval = new \DateInterval('P1D'); //referensi : https://en.wikipedia.org/wiki/ISO_8601#Durations
-        $daterange = new \DatePeriod($begin, $interval ,$end);
+        $interval  = new \DateInterval('P1D');
+        $daterange = new \DatePeriod($begin, $interval, $end);
 
+        // Hitung selisih hari
+        $jumlahHari = (new \DateTime($tglMulai))->diff(new \DateTime($tglAkhir))->days + 1;
 
         foreach ($daterange as $date) {
-            $tanggal = $date->format("Y-m-d");
 
-            $cek = MappingShift::query()->where('user_id', $request['user_id'])->where('tanggal', $tanggal)->first();
+            $tanggal = $date->format("Y-m-d");
+            $hariIni = $date->format("w"); // 0 = Minggu
+
+            $cek = MappingShift::query()
+                ->where('user_id', $userId)
+                ->where('tanggal', $tanggal)
+                ->first();
 
             if (!$cek) {
-                if ($request["shift_id"] === 1) {
-                    $request["status_absen"] = "Libur";
+
+                // RULE BARU: Jika lebih dari 7 hari → hari Minggu otomatis Libur
+                if ($jumlahHari > 7 && $hariIni == 0) {
+                    $shiftId = 1; // shift libur
+                    $statusAbsen = "Libur";
                 } else {
-                    $request["status_absen"] = "Tidak Masuk";
+                    $shiftId = $request["shift_id"];
+
+                    if ($shiftId == 1) {
+                        $statusAbsen = "Libur";
+                    } else {
+                        $statusAbsen = "Tidak Masuk";
+                    }
                 }
 
-                $request["tanggal"] = $tanggal;
-
-                $validatedData = $request->validate([
-                    'user_id' => 'required',
-                    'shift_id' => 'required',
-                    'tanggal' => 'required',
-                    'status_absen' => 'required',
+                MappingShift::create([
+                    'user_id' => $userId,
+                    'shift_id' => $shiftId,
+                    'tanggal' => $tanggal,
+                    'status_absen' => $statusAbsen,
+                    'lock_location' => $request['lock_location'] ?: null,
+                    'telat' => 0,
+                    'pulang_cepat' => 0,
                 ]);
-
-                $validatedData['lock_location'] = $request['lock_location'] ?: null;
-                $validatedData['telat'] = 0;
-                $validatedData['pulang_cepat'] = 0;
-
-                MappingShift::create($validatedData);
             }
         }
-        return redirect('/pegawai/shift/' . $request["user_id"])->with('success', 'Data Berhasil di Tambahkan');
+
+        return redirect('/pegawai/shift/' . $userId)->with('success', 'Data Berhasil di Tambahkan');
     }
 
     /**
